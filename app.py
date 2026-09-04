@@ -297,7 +297,7 @@ Praxis tatsächlich verwendet wird.
 gleich lassen, nie vergrößern. Da es für $n$ Punkte nur endlich viele Partitionen in $k$
 Gruppen gibt, kann sich keine Partition wiederholen, ohne dass der Algorithmus terminiert -
 Lloyd's Algorithmus konvergiert deshalb garantiert in endlich vielen Schritten
-(siehe [tests/test_algorithm.py](tests/test_algorithm.py), das die Monotonie über viele
+(siehe `tests/test_algorithm.py`, das die Monotonie über viele
 Zufallsinstanzen prüft). Konvergenz ist dabei ausdrücklich **nur** ein Nachweis, dass ein
 **lokales** Optimum erreicht ist - welches, hängt von der Startkonfiguration ab (siehe
 `test_bad_init_can_converge_to_a_worse_local_optimum`, das genau diesen Fall von Hand
@@ -314,8 +314,8 @@ $$
 Dieses Seeding-Schema garantiert (in Erwartung) eine $O(\log k)$-Approximation des
 globalen Optimums - eine beweisbare Garantie, die reine Zufalls-Init nicht hat.
 
-Implementiert in [km_algorithm.py](km_algorithm.py) (Lloyd's Algorithmus, beide
-Init-Strategien) und [km_evaluation.py](km_evaluation.py) (Multistart-Vergleich).
+Implementiert in `km_algorithm.py` (Lloyd's Algorithmus, beide Init-Strategien) und
+`km_evaluation.py` (Multistart-Vergleich).
         """
     )
 
