@@ -1,4 +1,4 @@
-"""Defaults, Regler-Grenzen, Sicherheitsgrenzen und Presets fuer die k-Means-Demo."""
+"""Defaults, Regler-Grenzen, Sicherheitsgrenzen und Presets für die k-Means-Demo."""
 
 DEFAULT_N_POINTS = 120
 DEFAULT_K = 3
@@ -17,11 +17,11 @@ MAX_ITERATIONS = 50
 
 # Live "does randomness matter?" multistart comparison, computed on every rerun.
 N_RESTARTS_MULTISTART = 40
-NEAR_BEST_TOLERANCE = 0.01  # 1% ueber der besten gefundenen Inertia gilt noch als "nahe am Besten"
+NEAR_BEST_TOLERANCE = 0.01  # 1% über der besten gefundenen Inertia gilt noch als "nahe am Besten"
 
 INIT_STRATEGIES = ("random", "kmeans++")
 INIT_STRATEGY_LABELS = {
-    "random": "Zufaellige Startpunkte",
+    "random": "Zufällige Startpunkte",
     "kmeans++": "k-Means++",
 }
 
@@ -29,13 +29,13 @@ PRESETS = {
     "Einfaches Beispiel (klar getrennte Gruppen)": {
         "n_points": 60, "k": 3, "spread": 0.15, "imbalance": 0.0, "seed": 1,
     },
-    "Mittlere Schwierigkeit (etwas Ueberlappung)": {
+    "Mittlere Schwierigkeit (etwas Überlappung)": {
         "n_points": 120, "k": 4, "spread": 0.4, "imbalance": 0.0, "seed": 7,
     },
-    "Schwerer Fall (ungleiche Gruppengroessen)": {
+    "Schwerer Fall (ungleiche Gruppengrößen)": {
         "n_points": 150, "k": 5, "spread": 0.15, "imbalance": 0.9, "seed": 1,
     },
-    "Viele Gruppen (Suchraum waechst mit k)": {
+    "Viele Gruppen (Suchraum wächst mit k)": {
         "n_points": 240, "k": 8, "spread": 0.4, "imbalance": 0.3, "seed": 11,
     },
 }

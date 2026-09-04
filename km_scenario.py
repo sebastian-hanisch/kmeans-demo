@@ -1,19 +1,19 @@
-"""Zufaellige 2D-Punktwolken fuer die k-Means-Demo: k Gauss-Cluster, deren Ueberlappung
-(spread) und Groessen-/Dichte-Ungleichgewicht (imbalance) unabhaengig einstellbar sind."""
+"""Zufällige 2D-Punktwolken für die k-Means-Demo: k Gauss-Cluster, deren Überlappung
+(spread) und Größen-/Dichte-Ungleichgewicht (imbalance) unabhängig einstellbar sind."""
 
 from dataclasses import dataclass
 
 import numpy as np
 
 RING_RADIUS = 3.0
-MIN_STD_FRACTION = 0.05  # Untergrenze fuer die Streuung, auch bei sehr kleinem spread
+MIN_STD_FRACTION = 0.05  # Untergrenze für die Streuung, auch bei sehr kleinem spread
 
 
 @dataclass(frozen=True)
 class ClusteringInstance:
     points: tuple  # ((x, y), ...), Erzeugungsreihenfolge nach Cluster gruppiert
     true_labels: tuple  # welchem erzeugenden Cluster jeder Punkt entstammt
-    true_centers: tuple  # ((x, y), ...), k Eintraege
+    true_centers: tuple  # ((x, y), ...), k Einträge
     k: int
 
     @property
@@ -25,10 +25,10 @@ class ClusteringInstance:
 
 
 def _cluster_shares(k, imbalance):
-    """Cluster 0 wird mit wachsendem imbalance groesser (mehr Punkte, mehr Streuung),
-    die uebrigen k-1 Cluster entsprechend kleiner und enger - so entsteht bei
-    imbalance=1 der Lehrbuchfall 'eine grosse diffuse + mehrere kleine dichte Gruppen',
-    bei imbalance=0 sind alle Cluster gleich gross und gleich eng."""
+    """Cluster 0 wird mit wachsendem imbalance größer (mehr Punkte, mehr Streuung),
+    die übrigen k-1 Cluster entsprechend kleiner und enger - so entsteht bei
+    imbalance=1 der Lehrbuchfall 'eine große diffuse + mehrere kleine dichte Gruppen',
+    bei imbalance=0 sind alle Cluster gleich groß und gleich eng."""
     weights = np.ones(k)
     if k > 1:
         weights[0] = 1 + imbalance * 2 * (k - 1)
@@ -45,10 +45,10 @@ def _cluster_stds(k, spread, imbalance):
 
 
 def generate_instance(n_points, k, spread, imbalance, seed):
-    """spread in [0.1, 0.9] steuert die Ueberlappung der Cluster relativ zum
-    Ring-Radius (klein = klar getrennt, gross = starke Ueberlappung). imbalance in
-    [0, 1] macht Cluster 0 zunehmend groesser und diffuser als die uebrigen - beides
-    unabhaengig voneinander regelbar, um Trennbarkeit und Groessen-Ungleichgewicht
+    """spread in [0.1, 0.9] steuert die Überlappung der Cluster relativ zum
+    Ring-Radius (klein = klar getrennt, groß = starke Überlappung). imbalance in
+    [0, 1] macht Cluster 0 zunehmend größer und diffuser als die übrigen - beides
+    unabhängig voneinander regelbar, um Trennbarkeit und Größen-Ungleichgewicht
     getrennt als Schwierigkeitsachsen zu zeigen."""
     rng = np.random.default_rng(seed)
 

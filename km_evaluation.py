@@ -1,5 +1,5 @@
 """Kennzahlen aus einem Lloyd-Lauf (live, pro Schritt) sowie der Multistart-Vergleich
-zwischen Zufalls- und k-Means++-Initialisierung, der die "Wie stark haengt das Ergebnis
+zwischen Zufalls- und k-Means++-Initialisierung, der die "Wie stark hängt das Ergebnis
 vom Zufall ab?"-Sektion der App live berechnet, nicht nur behauptet."""
 
 from dataclasses import dataclass
@@ -11,7 +11,7 @@ from km_constants import NEAR_BEST_TOLERANCE
 
 
 def stats_at_step(result, step):
-    """Live-Kennzahlen fuer die Metrikzeile beim Schritt-Slider / Abspielen."""
+    """Live-Kennzahlen für die Metrikzeile beim Schritt-Slider / Abspielen."""
     s = result.steps[step]
     is_last_step = step == len(result.steps) - 1
     return {
@@ -27,7 +27,7 @@ class StrategySummary:
     final_inertias: tuple
     best_inertia: float
     mean_inertia: float
-    near_best_fraction: float  # Anteil Laeufe hoechstens NEAR_BEST_TOLERANCE ueber dem globalen Besten
+    near_best_fraction: float  # Anteil Läufe höchstens NEAR_BEST_TOLERANCE über dem globalen Besten
 
 
 @dataclass(frozen=True)
@@ -45,11 +45,11 @@ def _run_final_inertias(data, k, init_strategy, seeds):
 
 
 def multistart_comparison(data, k, n_restarts, base_seed):
-    """Fuehrt fuer beide Init-Strategien je n_restarts unabhaengige Laeufe auf denselben
+    """Führt für beide Init-Strategien je n_restarts unabhängige Läufe auf denselben
     Daten aus und vergleicht die Verteilung der jeweils erreichten (finalen) Inertia. Das
-    ueber beide Strategien gemeinsam beste gefundene Ergebnis dient als praktischer Proxy
-    fuers globale Optimum - ein exaktes globales Optimum ist fuer k-Means NP-schwer zu
-    berechnen (siehe Mathe-Abschnitt der App), daher gibt es keinen exakten Referenzloeser."""
+    über beide Strategien gemeinsam beste gefundene Ergebnis dient als praktischer Proxy
+    fürs globale Optimum - ein exaktes globales Optimum ist für k-Means NP-schwer zu
+    berechnen (siehe Mathe-Abschnitt der App), daher gibt es keinen exakten Referenzlöser."""
     seed_rng = np.random.default_rng(base_seed)
     seeds_random = seed_rng.integers(0, 2**31 - 1, size=n_restarts)
     seeds_kpp = seed_rng.integers(0, 2**31 - 1, size=n_restarts)

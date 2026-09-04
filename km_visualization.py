@@ -1,6 +1,6 @@
-"""Plotly-Visualisierungen: Punktwolke mit Clusterzuordnung (Kernvisual, Schritt-fuer-
+"""Plotly-Visualisierungen: Punktwolke mit Clusterzuordnung (Kernvisual, Schritt-für-
 Schritt animierbar wie der Suchbaum in branch-bound-demo), Inertia-Konvergenz-Diagramm
-und die Verteilung der finalen Inertia ueber die Multistart-Vergleichslaeufe."""
+und die Verteilung der finalen Inertia über die Multistart-Vergleichsläufe."""
 
 import numpy as np
 
@@ -69,7 +69,7 @@ def build_inertia_chart(result, step):
     )
     fig.update_layout(
         template="plotly_white", height=280,
-        xaxis_title="Iteration", yaxis_title="Inertia (Summe quadrierter Abstaende)",
+        xaxis_title="Iteration", yaxis_title="Inertia (Summe quadrierter Abstände)",
         showlegend=False, margin=dict(t=20, l=10, r=10, b=10),
     )
     fig.update_xaxes(fixedrange=True)
@@ -82,7 +82,7 @@ def build_multistart_distribution_chart(comparison):
 
     fig = go.Figure()
     for key, label, color in [
-        ("random", "Zufaellige Startpunkte", "#d68a2e"),
+        ("random", "Zufällige Startpunkte", "#d68a2e"),
         ("kmeans++", "k-Means++", "#1f77b4"),
     ]:
         summary = comparison.strategies[key]

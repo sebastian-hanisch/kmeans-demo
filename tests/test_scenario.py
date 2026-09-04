@@ -23,9 +23,9 @@ def test_different_seed_gives_different_layout():
 
 
 def test_low_spread_clusters_are_well_separated_from_true_centers():
-    """Bei kleinem spread muss jeder Punkt seinem eigenen wahren Zentrum naeher sein als
-    jedem anderen wahren Zentrum - die klar-getrennte-Gruppen-Praemisse des einfachsten
-    Presets muss tatsaechlich zutreffen, nicht nur behauptet sein."""
+    """Bei kleinem spread muss jeder Punkt seinem eigenen wahren Zentrum näher sein als
+    jedem anderen wahren Zentrum - die klar-getrennte-Gruppen-Prämisse des einfachsten
+    Presets muss tatsächlich zutreffen, nicht nur behauptet sein."""
     instance = generate_instance(n_points=60, k=3, spread=0.12, imbalance=0.0, seed=1)
     points = np.array(instance.points)
     true_centers = np.array(instance.true_centers)

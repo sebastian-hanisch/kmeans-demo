@@ -1,14 +1,14 @@
-"""k-Means fuer die Standortwahl von Depots - interaktive Konzept-Demo
+"""k-Means für die Standortwahl von Depots - interaktive Konzept-Demo
 Sebastian Hanisch - Operations Research und Machine Learning
 
 Anders als die Fall-Demos im Portfolio (ein Anwendungsfall, mehrere Verfahren im
-Vergleich) zeigt diese Demo EIN Verfahren - k-Means (Lloyd's Algorithmus) - und laesst
+Vergleich) zeigt diese Demo EIN Verfahren - k-Means (Lloyd's Algorithmus) - und lässt
 stattdessen die Optimierungslandschaft wachsen: von klar getrennten Gruppen, bei denen
 jede Startkonfiguration beim selben Ergebnis landet, bis zu ungleichen, engen Gruppen, bei
-denen Zufalls-Init reproduzierbar an schlechten lokalen Optima scheitert. Zweites Stueck
-der "Konzepte"-Reihe (siehe README fuer die Einordnung).
+denen Zufalls-Init reproduzierbar an schlechten lokalen Optima scheitert. Zweites Stück
+der "Konzepte"-Reihe (siehe README für die Einordnung).
 
-Lauffaehig mit: streamlit run app.py
+Lauffähig mit: streamlit run app.py
 """
 
 import time
@@ -49,58 +49,58 @@ st.title("📍 k-Means für die Standortwahl von Depots")
 st.markdown(
     """
 Kundenstandorte sollen auf **k Depots** aufgeteilt werden, jedes Depot bedient die ihm am
-naechsten liegenden Kunden - gesucht ist die Aufteilung, die die Summe der quadrierten
-Entfernungen zwischen Kunde und zustaendigem Depot minimiert. Das ist exakt das, was
-**k-Means** berechnet: eine Optimierungsheuristik, die abwechselnd Kunden dem naechsten
+nächsten liegenden Kunden - gesucht ist die Aufteilung, die die Summe der quadrierten
+Entfernungen zwischen Kunde und zuständigem Depot minimiert. Das ist exakt das, was
+**k-Means** berechnet: eine Optimierungsheuristik, die abwechselnd Kunden dem nächsten
 Depot zuordnet und jedes Depot in den Schwerpunkt seiner zugeordneten Kunden verschiebt
-(**Lloyd's Algorithmus**). Genau **wie** das funktioniert, erklaert der aufgeklappte
-Abschnitt direkt darunter - bevor weiter unten die Suche live dazu laeuft und die Frage
-"📐 Wie stark haengt das Ergebnis vom Zufall der Startpunkte ab?" live beantwortet wird.
+(**Lloyd's Algorithmus**). Genau **wie** das funktioniert, erklärt der aufgeklappte
+Abschnitt direkt darunter - bevor weiter unten die Suche live dazu läuft und die Frage
+"📐 Wie stark hängt das Ergebnis vom Zufall der Startpunkte ab?" live beantwortet wird.
 """
 )
 st.caption(
     "Anders als die Fall-Demos im Portfolio, die an einem Anwendungsfall mehrere Verfahren "
     "vergleichen, zeigt diese Demo - Teil der wachsenden \"Konzepte\"-Reihe - **ein** Verfahren "
     "an einem wachsenden Beispiel: k-Means selbst ist eine Optimierungsheuristik (kein exakter "
-    "Loeser) und kann, wie jede Local-Search-Methode im Portfolio, in einem lokalen Optimum "
-    "haengen bleiben."
+    "Löser) und kann, wie jede Local-Search-Methode im Portfolio, in einem lokalen Optimum "
+    "hängen bleiben."
 )
 
 with st.expander("So funktioniert k-Means", expanded=True):
     st.markdown(
         """
-Lloyd's Algorithmus wiederholt zwei einfache Schritte, bis sich nichts mehr aendert:
+Lloyd's Algorithmus wiederholt zwei einfache Schritte, bis sich nichts mehr ändert:
 
-1. **Zuweisung**: jeder Kunde wird dem naeher gelegenen der aktuellen Depot-Standorte
+1. **Zuweisung**: jeder Kunde wird dem näher gelegenen der aktuellen Depot-Standorte
    zugeordnet.
 2. **Update**: jedes Depot wandert an den Schwerpunkt (Mittelwert) der ihm gerade
    zugeordneten Kunden - das ist nachweislich die Position, die die Summe der quadrierten
    Entfernungen innerhalb dieser Gruppe minimiert (siehe "📐 Mathematische Formulierung").
 
-Jeder Durchlauf verbessert die Zielfunktion (oder laesst sie gleich) - sie kann nie wieder
+Jeder Durchlauf verbessert die Zielfunktion (oder lässt sie gleich) - sie kann nie wieder
 schlechter werden. Das Verfahren **konvergiert** deshalb garantiert, aber Konvergenz ist
-**keine Garantie fuers globale Optimum**: je nachdem, wo die Depots zu Beginn stehen, kann
-das Verfahren in einer schlechteren, aber stabilen Aufteilung "haengen bleiben". Zwei
+**keine Garantie fürs globale Optimum**: je nachdem, wo die Depots zu Beginn stehen, kann
+das Verfahren in einer schlechteren, aber stabilen Aufteilung "hängen bleiben". Zwei
 Start-Strategien stehen zur Wahl:
 
-- **Zufaellige Startpunkte**: k Kunden werden gleichverteilt als erste Depot-Standorte
-  gewaehlt - einfach, aber es kann passieren, dass zwei Startpunkte in dieselbe Kundengruppe
-  fallen und eine andere Gruppe zunaechst ganz ohne "eigenes" Depot bleibt.
-- **k-Means++**: der erste Startpunkt wird zufaellig gewaehlt, jeder weitere bevorzugt einen
+- **Zufällige Startpunkte**: k Kunden werden gleichverteilt als erste Depot-Standorte
+  gewählt - einfach, aber es kann passieren, dass zwei Startpunkte in dieselbe Kundengruppe
+  fallen und eine andere Gruppe zunächst ganz ohne "eigenes" Depot bleibt.
+- **k-Means++**: der erste Startpunkt wird zufällig gewählt, jeder weitere bevorzugt einen
   Kunden, der **weit von allen bisherigen Startpunkten entfernt** liegt - dadurch landet in
-  der Praxis viel oefter genau ein Startpunkt pro tatsaechlicher Gruppe.
+  der Praxis viel öfter genau ein Startpunkt pro tatsächlicher Gruppe.
 
-Die Punktwolke weiter unten zeigt das live: Punkte sind nach aktueller Zuordnung eingefaerbt,
+Die Punktwolke weiter unten zeigt das live: Punkte sind nach aktueller Zuordnung eingefärbt,
 Sterne markieren die aktuellen Depot-Standorte.
         """
     )
 
 st.caption("🎯 Schnellstart – ein Beispielszenario laden:")
 PRESET_HELP = {
-    "Einfaches Beispiel (klar getrennte Gruppen)": "3 klar getrennte, gleich grosse Gruppen - k-Means++ trifft praktisch immer die beste Aufteilung, reine Zufalls-Init kann aber auch hier schon danebengreifen.",
-    "Mittlere Schwierigkeit (etwas Ueberlappung)": "4 Gruppen mit spuerbarer Ueberlappung - der Unterschied zwischen den Start-Strategien wird deutlicher sichtbar.",
-    "Schwerer Fall (ungleiche Gruppengroessen)": "5 Gruppen, eine davon gross und diffus, die uebrigen klein und dicht - Zufalls-Init scheitert hier reproduzierbar oefter an einem schlechten lokalen Optimum.",
-    "Viele Gruppen (Suchraum waechst mit k)": "8 Gruppen - je mehr Depots gesucht werden, desto mehr moegliche Start-Kombinationen gibt es, und desto haeufiger trifft reine Zufalls-Init eine schlechte.",
+    "Einfaches Beispiel (klar getrennte Gruppen)": "3 klar getrennte, gleich große Gruppen - k-Means++ trifft praktisch immer die beste Aufteilung, reine Zufalls-Init kann aber auch hier schon danebengreifen.",
+    "Mittlere Schwierigkeit (etwas Überlappung)": "4 Gruppen mit spürbarer Überlappung - der Unterschied zwischen den Start-Strategien wird deutlicher sichtbar.",
+    "Schwerer Fall (ungleiche Gruppengrößen)": "5 Gruppen, eine davon groß und diffus, die übrigen klein und dicht - Zufalls-Init scheitert hier reproduzierbar öfter an einem schlechten lokalen Optimum.",
+    "Viele Gruppen (Suchraum wächst mit k)": "8 Gruppen - je mehr Depots gesucht werden, desto mehr mögliche Start-Kombinationen gibt es, und desto häufiger trifft reine Zufalls-Init eine schlechte.",
 }
 preset_cols = st.columns(len(C.PRESETS))
 for i, name in enumerate(C.PRESETS.keys()):
@@ -120,36 +120,36 @@ with st.sidebar:
     n_points = st.slider("Anzahl Kunden", *bounds("n_points_slider"), key="n_points_slider")
     k = st.slider("Anzahl Depots (k)", *bounds("k_slider"), key="k_slider")
     spread = st.slider(
-        "Streuung / Ueberlappung", *bounds("spread_slider"), key="spread_slider", step=0.05,
-        help="Klein = Gruppen klar getrennt. Gross = Gruppen ueberlappen sich spuerbar.",
+        "Streuung / Überlappung", *bounds("spread_slider"), key="spread_slider", step=0.05,
+        help="Klein = Gruppen klar getrennt. Groß = Gruppen überlappen sich spürbar.",
     )
     imbalance = st.slider(
-        "Groessen-Ungleichgewicht", *bounds("imbalance_slider"), key="imbalance_slider", step=0.05,
-        help="0 = alle Gruppen gleich gross und gleich dicht. 1 = eine Gruppe wird gross und "
-        "diffus, die uebrigen klein und dicht - der klassische Fall, in dem Zufalls-Init "
-        "besonders oft an einem schlechten lokalen Optimum haengen bleibt.",
+        "Größen-Ungleichgewicht", *bounds("imbalance_slider"), key="imbalance_slider", step=0.05,
+        help="0 = alle Gruppen gleich groß und gleich dicht. 1 = eine Gruppe wird groß und "
+        "diffus, die übrigen klein und dicht - der klassische Fall, in dem Zufalls-Init "
+        "besonders oft an einem schlechten lokalen Optimum hängen bleibt.",
     )
     seed = st.number_input("Zufalls-Seed", *bounds("seed_input"), key="seed_input", step=1)
 
     st.markdown("**Suchverhalten**")
     init_strategy = st.radio(
-        "Start-Strategie (fuer die Animation unten)",
+        "Start-Strategie (für die Animation unten)",
         options=C.INIT_STRATEGIES, key="init_strategy_radio",
         format_func=lambda s: C.INIT_STRATEGY_LABELS[s],
         help="Steuert nur den animierten Einzel-Lauf unten - der '📐'-Vergleich weiter unten "
-        "prueft ohnehin immer beide Strategien parallel.",
+        "prüft ohnehin immer beide Strategien parallel.",
     )
 
     st.button(
         "🎲 Neue Punktwolke generieren",
         width="stretch",
         on_click=randomize_seed,
-        help="Wuerfelt einen neuen Zufalls-Seed fuer die Kundenstandorte.",
+        help="Würfelt einen neuen Zufalls-Seed für die Kundenstandorte.",
     )
 
 sync_query_params(n_points, k, spread, imbalance, seed, init_strategy)
 
-with st.spinner("Fuehre Lloyd's Algorithmus aus..."):
+with st.spinner("Führe Lloyd's Algorithmus aus..."):
     instance, result = _compute_run(int(n_points), int(k), spread, imbalance, int(seed), init_strategy)
 
 max_step = len(result.steps) - 1
@@ -165,7 +165,7 @@ with step_col:
     step = st.slider(
         "Schritt (Iteration)", 0, max_step, key="km_step",
         help="Schritt 0 = erste Zuweisung nach der Initialisierung, danach je ein "
-        "vollstaendiger Update-dann-Zuweisung-Zyklus.",
+        "vollständiger Update-dann-Zuweisung-Zyklus.",
     )
 with play_col:
     auto_play = st.button("▶️ Abspielen", width="stretch")
@@ -199,7 +199,7 @@ lm1.metric("Iteration", live["iteration"])
 lm2.metric(
     "Inertia (WCSS)", f"{live['inertia']:,.1f}",
     help="Summe der quadrierten Entfernungen jedes Kunden zu seinem aktuell zugewiesenen "
-    "Depot - die Groesse, die k-Means minimiert.",
+    "Depot - die Größe, die k-Means minimiert.",
 )
 lm3.metric(
     "Kunden, die dieses Depot gewechselt haben", live["n_changed"],
@@ -209,7 +209,7 @@ lm4.metric("Konvergiert?", "Ja" if live["converged"] else "Nein")
 
 if result.truncated:
     st.error(
-        f"⛔ Nach {C.MAX_ITERATIONS} Iterationen noch nicht konvergiert - ungewoehnlich fuer "
+        f"⛔ Nach {C.MAX_ITERATIONS} Iterationen noch nicht konvergiert - ungewöhnlich für "
         f"k-Means, das gezeigte Ergebnis ist der Zwischenstand, nicht der stabile Endzustand."
     )
 
@@ -219,8 +219,8 @@ st.subheader("📐 Wie stark hängt das Ergebnis vom Zufall der Startpunkte ab?"
 st.markdown(
     f"""
 Beide Start-Strategien konvergieren garantiert (siehe oben) - der Unterschied liegt allein
-darin, **wo** sie landen. Live fuer Ihr aktuelles Szenario mit je
-**{C.N_RESTARTS_MULTISTART} unabhaengigen Laeufen** pro Strategie geprueft, nicht nur
+darin, **wo** sie landen. Live für Ihr aktuelles Szenario mit je
+**{C.N_RESTARTS_MULTISTART} unabhängigen Läufen** pro Strategie geprüft, nicht nur
 behauptet:
 """
 )
@@ -232,38 +232,38 @@ gap = random_summary.mean_inertia - kpp_summary.mean_inertia
 
 mc1, mc2, mc3 = st.columns(3)
 mc1.metric(
-    "Zufaellige Startpunkte – Ø finale Inertia", f"{random_summary.mean_inertia:,.1f}",
+    "Zufällige Startpunkte – Ø finale Inertia", f"{random_summary.mean_inertia:,.1f}",
     delta=f"{gap:,.1f} ggü. k-Means++" if gap != 0 else None, delta_color="inverse",
-    help=f"Mittelwert ueber {C.N_RESTARTS_MULTISTART} unabhaengige Laeufe mit zufaelligen "
+    help=f"Mittelwert über {C.N_RESTARTS_MULTISTART} unabhängige Läufe mit zufälligen "
     f"Startpunkten. Nur {random_summary.near_best_fraction * 100:.0f}% davon landen nahe "
     f"am besten gefundenen Ergebnis.",
 )
 mc2.metric(
     "k-Means++ – Ø finale Inertia", f"{kpp_summary.mean_inertia:,.1f}",
-    help=f"Mittelwert ueber {C.N_RESTARTS_MULTISTART} unabhaengige Laeufe mit k-Means++. "
+    help=f"Mittelwert über {C.N_RESTARTS_MULTISTART} unabhängige Läufe mit k-Means++. "
     f"{kpp_summary.near_best_fraction * 100:.0f}% davon landen nahe am besten gefundenen "
     f"Ergebnis.",
 )
 mc3.metric(
     "Bestes gefundenes Ergebnis", f"{comparison.global_best_inertia:,.1f}",
-    help="Kleinste Inertia ueber alle Laeufe beider Strategien - ein exaktes globales "
-    "Optimum ist fuer k-Means NP-schwer zu berechnen, dies ist der praktische Proxy dafuer.",
+    help="Kleinste Inertia über alle Läufe beider Strategien - ein exaktes globales "
+    "Optimum ist für k-Means NP-schwer zu berechnen, dies ist der praktische Proxy dafür.",
 )
 
 st.plotly_chart(build_multistart_distribution_chart(comparison), width="stretch")
 
 if gap > comparison.global_best_inertia * 0.05:
     st.success(
-        f"✅ Bei diesem Szenario liegt Zufalls-Init im Mittel **{gap:,.1f}** ueber "
-        f"k-Means++ - {random_summary.near_best_fraction * 100:.0f}% der Zufalls-Laeufe "
-        f"gegenueber {kpp_summary.near_best_fraction * 100:.0f}% der k-Means++-Laeufe "
+        f"✅ Bei diesem Szenario liegt Zufalls-Init im Mittel **{gap:,.1f}** über "
+        f"k-Means++ - {random_summary.near_best_fraction * 100:.0f}% der Zufalls-Läufe "
+        f"gegenüber {kpp_summary.near_best_fraction * 100:.0f}% der k-Means++-Läufe "
         f"landen nahe am besten gefundenen Ergebnis. Der Unterschied liegt komplett in der "
         f"Startstrategie, nicht im Algorithmus selbst."
     )
 else:
     st.info(
-        "Bei diesem (einfachen) Szenario ist der Unterschied noch klein - ein groesseres "
-        "Groessen-Ungleichgewicht oder mehr Gruppen (Regler links) macht ihn deutlicher."
+        "Bei diesem (einfachen) Szenario ist der Unterschied noch klein - ein größeres "
+        "Größen-Ungleichgewicht oder mehr Gruppen (Regler links) macht ihn deutlicher."
     )
 
 st.markdown("---")
@@ -279,10 +279,10 @@ $$
 \min_{c_1,\dots,c_k} \sum_{i=1}^n \min_{j \in \{1,\dots,k\}} \lVert x_i - c_j \rVert^2
 $$
 
-Bereits fuer $k=2$ in der Ebene ist das exakte globale Minimum NP-schwer zu berechnen
+Bereits für $k=2$ in der Ebene ist das exakte globale Minimum NP-schwer zu berechnen
 (Aloise et al., 2009, "NP-hardness of Euclidean sum-of-squares clustering") - deshalb zeigt
-diese Demo bewusst keinen exakten Loeser, sondern die Heuristik, mit der k-Means in der
-Praxis tatsaechlich verwendet wird.
+diese Demo bewusst keinen exakten Löser, sondern die Heuristik, mit der k-Means in der
+Praxis tatsächlich verwendet wird.
 
 **Lloyd's Algorithmus** wiederholt zwei Schritte bis zur Konvergenz:
 
@@ -294,18 +294,18 @@ Praxis tatsaechlich verwendet wird.
    $c_j$ gleich Null setzen ergibt genau den Mittelwert).
 
 **Konvergenz:** jeder der beiden Schritte kann die Zielfunktion nur verkleinern oder
-gleich lassen, nie vergroessern. Da es fuer $n$ Punkte nur endlich viele Partitionen in $k$
+gleich lassen, nie vergrößern. Da es für $n$ Punkte nur endlich viele Partitionen in $k$
 Gruppen gibt, kann sich keine Partition wiederholen, ohne dass der Algorithmus terminiert -
 Lloyd's Algorithmus konvergiert deshalb garantiert in endlich vielen Schritten
-(siehe [tests/test_algorithm.py](tests/test_algorithm.py), das die Monotonie ueber viele
-Zufallsinstanzen prueft). Konvergenz ist dabei ausdruecklich **nur** ein Nachweis, dass ein
-**lokales** Optimum erreicht ist - welches, haengt von der Startkonfiguration ab (siehe
+(siehe [tests/test_algorithm.py](tests/test_algorithm.py), das die Monotonie über viele
+Zufallsinstanzen prüft). Konvergenz ist dabei ausdrücklich **nur** ein Nachweis, dass ein
+**lokales** Optimum erreicht ist - welches, hängt von der Startkonfiguration ab (siehe
 `test_bad_init_can_converge_to_a_worse_local_optimum`, das genau diesen Fall von Hand
 nachrechnet).
 
 **k-Means++-Seeding** (Arthur & Vassilvitskii, 2007): der erste Startpunkt wird
-gleichverteilt gewaehlt, jeder weitere Punkt $x$ mit Wahrscheinlichkeit proportional zu
-$D(x)^2$, wobei $D(x)$ der Abstand zum naechstgelegenen bereits gewaehlten Zentrum ist:
+gleichverteilt gewählt, jeder weitere Punkt $x$ mit Wahrscheinlichkeit proportional zu
+$D(x)^2$, wobei $D(x)$ der Abstand zum nächstgelegenen bereits gewählten Zentrum ist:
 
 $$
 P(x) = \frac{D(x)^2}{\sum_{x'} D(x')^2}

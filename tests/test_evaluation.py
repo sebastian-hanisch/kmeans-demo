@@ -20,7 +20,7 @@ def test_near_best_fraction_is_a_valid_share():
 
 
 def test_easy_well_separated_scenario_favors_kmeanspp_almost_always():
-    """Bei klar getrennten, gleich grossen Gruppen (das einfachste Preset) findet
+    """Bei klar getrennten, gleich großen Gruppen (das einfachste Preset) findet
     k-Means++ so gut wie immer das beste Ergebnis - die D^2-Gewichtung trifft praktisch
     immer je einen Startpunkt pro Gruppe. Reine Zufalls-Init dagegen kann selbst hier
     noch danebengreifen (zwei Startpunkte in derselben Gruppe, eine Gruppe bleibt ohne
@@ -33,8 +33,8 @@ def test_easy_well_separated_scenario_favors_kmeanspp_almost_always():
 
 
 def test_hard_imbalanced_scenario_shows_a_clear_gap():
-    """Beim 'schweren Fall'-Preset (ungleiche Gruppengroessen) soll k-Means++ im
-    Mittel spuerbar bessere (kleinere) finale Inertia erreichen als Zufalls-Init -
+    """Beim 'schweren Fall'-Preset (ungleiche Gruppengrößen) soll k-Means++ im
+    Mittel spürbar bessere (kleinere) finale Inertia erreichen als Zufalls-Init -
     genau die Behauptung, die die App live in der '📐'-Sektion nachweist."""
     instance = generate_instance(n_points=150, k=5, spread=0.15, imbalance=0.9, seed=1)
     comparison = multistart_comparison(instance.as_array(), k=5, n_restarts=40, base_seed=1)

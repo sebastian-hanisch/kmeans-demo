@@ -1,10 +1,10 @@
-"""Lloyd's Algorithmus (k-Means) from scratch, mit vollstaendigem Iterations-Protokoll,
-damit die App Schritt fuer Schritt (Zuweisung -> Update -> Zuweisung -> ...) durchblaettern
+"""Lloyd's Algorithmus (k-Means) from scratch, mit vollständigem Iterations-Protokoll,
+damit die App Schritt für Schritt (Zuweisung -> Update -> Zuweisung -> ...) durchblättern
 kann - analog zum Knoten-Protokoll von Branch & Bound in branch-bound-demo/bb_solver.py.
 
 Bewusst ohne sklearn zur Laufzeit implementiert, damit jeder Zwischenschritt (nicht nur das
 Endergebnis) sichtbar gemacht werden kann. sklearn.cluster.KMeans dient in tests/ nur als
-unabhaengiger Kreuzvergleich fuer die eigene Implementierung.
+unabhängiger Kreuzvergleich für die eigene Implementierung.
 """
 
 from dataclasses import dataclass
@@ -17,16 +17,16 @@ from km_constants import MAX_ITERATIONS
 @dataclass(frozen=True)
 class Step:
     iteration: int  # 0 = erste Zuweisung nach der Initialisierung, danach je ein Lloyd-Update
-    centers: tuple  # ((x, y), ...), k Eintraege
-    labels: tuple  # naechstgelegenes Zentrum je Punkt, Erzeugungsreihenfolge wie die Daten
-    inertia: float  # Summe der quadrierten Abstaende zum jeweils zugewiesenen Zentrum (WCSS)
+    centers: tuple  # ((x, y), ...), k Einträge
+    labels: tuple  # nächstgelegenes Zentrum je Punkt, Erzeugungsreihenfolge wie die Daten
+    inertia: float  # Summe der quadrierten Abstände zum jeweils zugewiesenen Zentrum (WCSS)
     n_changed: int  # Punkte, die diesen Schritt das Cluster gewechselt haben (Schritt 0: alle)
 
 
 @dataclass(frozen=True)
 class RunResult:
-    steps: tuple  # Step-Folge in Ausfuehrungsreihenfolge
-    converged: bool  # True, wenn die letzte Zuweisung gegenueber der vorherigen unveraendert blieb
+    steps: tuple  # Step-Folge in Ausführungsreihenfolge
+    converged: bool  # True, wenn die letzte Zuweisung gegenüber der vorherigen unverändert blieb
     truncated: bool  # True, wenn max_iter erreicht wurde, ohne dass die Zuweisung stabil wurde
 
     @property
@@ -61,8 +61,8 @@ def _assign(data, centers):
 def _update_centers(data, labels, centers, k):
     """Neues Zentrum = Schwerpunkt der zugewiesenen Punkte (minimiert die Summe der
     quadrierten Abweichungen innerhalb des Clusters, siehe Mathe-Abschnitt der App). Ein
-    leer gewordenes Cluster behaelt sein bisheriges Zentrum unveraendert - eine gaengige,
-    einfache Behandlung dieses Randfalls, die nie einen Punkt komplett verwaist laesst."""
+    leer gewordenes Cluster behält sein bisheriges Zentrum unverändert - eine gängige,
+    einfache Behandlung dieses Randfalls, die nie einen Punkt komplett verwaist lässt."""
     new_centers = centers.copy()
     for i in range(k):
         mask = labels == i
@@ -72,15 +72,15 @@ def _update_centers(data, labels, centers, k):
 
 
 def init_random(data, k, rng):
-    """Zufaellige Startpunkte: k verschiedene Datenpunkte gleichverteilt gewaehlt."""
+    """Zufällige Startpunkte: k verschiedene Datenpunkte gleichverteilt gewählt."""
     idx = rng.choice(len(data), size=k, replace=False)
     return data[idx].copy()
 
 
 def init_kmeans_plusplus(data, k, rng):
     """k-Means++-Seeding (Arthur & Vassilvitskii, 2007): der erste Startpunkt wird
-    gleichverteilt gewaehlt, jeder weitere mit Wahrscheinlichkeit proportional zum
-    quadrierten Abstand zum naechstgelegenen bereits gewaehlten Zentrum - weit entfernte,
+    gleichverteilt gewählt, jeder weitere mit Wahrscheinlichkeit proportional zum
+    quadrierten Abstand zum nächstgelegenen bereits gewählten Zentrum - weit entfernte,
     noch unabgedeckte Punkte werden dadurch bevorzugt zu neuen Startzentren."""
     n = len(data)
     first = rng.integers(n)
@@ -99,11 +99,11 @@ INIT_FUNCTIONS = {"random": init_random, "kmeans++": init_kmeans_plusplus}
 
 
 def run(data, k, init_strategy, seed, max_iter=MAX_ITERATIONS):
-    """Fuehrt Lloyd's Algorithmus vollstaendig protokolliert aus: Schritt 0 ist die erste
-    Zuweisung nach der Initialisierung, jeder weitere Schritt ist ein vollstaendiger
+    """Führt Lloyd's Algorithmus vollständig protokolliert aus: Schritt 0 ist die erste
+    Zuweisung nach der Initialisierung, jeder weitere Schritt ist ein vollständiger
     Update-dann-Zuweisung-Zyklus. Terminiert, sobald sich die Zuweisung nicht mehr
-    aendert (bewiesen endlich, da es nur endlich viele Partitionen gibt und die Inertia
-    nie steigt - siehe Mathe-Abschnitt), spaetestens nach max_iter Schritten."""
+    ändert (bewiesen endlich, da es nur endlich viele Partitionen gibt und die Inertia
+    nie steigt - siehe Mathe-Abschnitt), spätestens nach max_iter Schritten."""
     rng = np.random.default_rng(seed)
     data = np.asarray(data, dtype=float)
     centers = INIT_FUNCTIONS[init_strategy](data, k, rng)

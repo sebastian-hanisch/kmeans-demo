@@ -41,7 +41,7 @@ def test_last_step_has_zero_changed_points_when_converged():
 def test_well_placed_init_converges_immediately_to_the_obvious_partition():
     """Zwei weit getrennte Punktpaare, Startzentren genau in der Mitte jedes Paares -
     das ist bereits die optimale Partition, ein Update-Schritt darf daran nichts mehr
-    aendern (deterministischer Nachweis der Kernrechnung: Zuweisung + Schwerpunkt-Update)."""
+    ändern (deterministischer Nachweis der Kernrechnung: Zuweisung + Schwerpunkt-Update)."""
     data = np.array([[0.0, 0.0], [0.0, 1.0], [10.0, 0.0], [10.0, 1.0]])
     centers = np.array([[0.0, 0.5], [10.0, 0.5]])
 
@@ -56,8 +56,8 @@ def test_well_placed_init_converges_immediately_to_the_obvious_partition():
 def test_bad_init_can_converge_to_a_worse_local_optimum():
     """Dieselben vier Punkte, aber mit beiden Startzentren im selben (linken) Paar -
     Lloyd's Algorithmus konvergiert stabil, aber auf eine schlechtere Partition
-    (nach x statt nach den tatsaechlichen Paaren getrennt). Das ist der Kern-Beleg
-    dafuer, dass Konvergenz allein keine Optimalitaet garantiert - die Existenzgrundlage
+    (nach x statt nach den tatsächlichen Paaren getrennt). Das ist der Kern-Beleg
+    dafür, dass Konvergenz allein keine Optimalität garantiert - die Existenzgrundlage
     der gesamten Demo, hier exakt nachgerechnet statt nur behauptet."""
     data = np.array([[0.0, 0.0], [0.0, 1.0], [10.0, 0.0], [10.0, 1.0]])
     bad_centers = np.array([[0.0, 0.0], [0.0, 1.0]])
@@ -87,9 +87,9 @@ def test_init_random_returns_k_distinct_data_points():
 
 def test_init_kmeans_plusplus_favors_the_far_small_cluster():
     """Statistische Absicherung des D^2-Gewichtungsschemas: bei einer stark
-    unausgewogenen Instanz (ein grosses Cluster nahe dem Ursprung, ein kleines, weit
-    entferntes) muss k-Means++ das kleine Cluster deutlich haeufiger als Startzentrum
-    treffen als eine gleichverteilte Zufallsauswahl - sonst waere die Implementierung
+    unausgewogenen Instanz (ein großes Cluster nahe dem Ursprung, ein kleines, weit
+    entferntes) muss k-Means++ das kleine Cluster deutlich häufiger als Startzentrum
+    treffen als eine gleichverteilte Zufallsauswahl - sonst wäre die Implementierung
     keine echte D^2-Gewichtung, sondern liefe faktisch auf Uniform-Sampling hinaus."""
     big_cluster = np.random.default_rng(1).normal(loc=[0, 0], scale=0.2, size=(95, 2))
     small_cluster = np.random.default_rng(2).normal(loc=[50, 50], scale=0.2, size=(5, 2))
@@ -114,9 +114,9 @@ def test_init_kmeans_plusplus_favors_the_far_small_cluster():
 
 
 def test_matches_sklearn_kmeans_from_the_same_initial_centers():
-    """Unabhaengiger Kreuzvergleich der eigenen Lloyd-Implementierung gegen
+    """Unabhängiger Kreuzvergleich der eigenen Lloyd-Implementierung gegen
     sklearn.cluster.KMeans: von denselben Startzentren aus muss dieselbe (oder eine
-    inertia-gleichwertige) Konvergenz erreicht werden. sklearn ist ausschliesslich ein
+    inertia-gleichwertige) Konvergenz erreicht werden. sklearn ist ausschließlich ein
     Test-Dependency, kein Laufzeit-Dependency der App."""
     sklearn = pytest.importorskip("sklearn.cluster")
 
