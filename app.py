@@ -30,6 +30,7 @@ from km_scenario import generate_instance
 from km_visualization import (
     build_inertia_chart,
     build_mean_vs_medoid_illustration,
+    build_mini_scatter_figure,
     build_multistart_distribution_chart,
     build_scatter_figure,
 )
@@ -48,6 +49,11 @@ def _compute_run(n_points, k, spread, imbalance, seed, init_strategy):
 def _compute_multistart(n_points, k, spread, imbalance, seed):
     instance = generate_instance(n_points, k, spread, imbalance, seed)
     return multistart_comparison(instance.as_array(), k, C.N_RESTARTS_MULTISTART, base_seed=seed)
+
+
+@st.cache_data(show_spinner=False)
+def _compute_example_run(instance, k, init_strategy, example_seed):
+    return run(instance.as_array(), k, init_strategy, example_seed)
 
 
 st.title("📍 k-Means für die Standortwahl von Depots")
@@ -156,6 +162,7 @@ sync_query_params(n_points, k, spread, imbalance, seed, init_strategy)
 
 with st.spinner("Führe Lloyd's Algorithmus aus..."):
     instance, result = _compute_run(int(n_points), int(k), spread, imbalance, int(seed), init_strategy)
+    comparison = _compute_multistart(int(n_points), int(k), spread, imbalance, int(seed))
 
 max_step = len(result.steps) - 1
 run_key = (n_points, k, spread, imbalance, seed, init_strategy)
@@ -218,6 +225,22 @@ if result.truncated:
         f"k-Means, das gezeigte Ergebnis ist der Zwischenstand, nicht der stabile Endzustand."
     )
 
+st.markdown("**Und mit anderen Zufalls-Seeds?**")
+st.caption(
+    f"Gleiche Kundenstandorte, gleiche Start-Strategie ({C.INIT_STRATEGY_LABELS[init_strategy]}) "
+    "wie oben - nur der Zufalls-Seed der Initialisierung unterscheidet sich. Diese Läufe stammen "
+    "aus genau der Stichprobe, die die Verteilung weiter unten zusammenfasst."
+)
+example_seeds = comparison.strategies[init_strategy].seeds[:4]
+example_cols = st.columns(len(example_seeds))
+for col, example_seed in zip(example_cols, example_seeds):
+    with col:
+        example_result = _compute_example_run(instance, int(k), init_strategy, int(example_seed))
+        st.plotly_chart(
+            build_mini_scatter_figure(instance, example_result), width="stretch", key=f"mini_{example_seed}"
+        )
+        st.caption(f"Seed {example_seed} · Inertia {example_result.final_inertia:,.1f}")
+
 st.markdown("---")
 
 st.subheader("📐 Wie stark hängt das Ergebnis vom Zufall der Startpunkte ab?")
@@ -230,7 +253,6 @@ behauptet:
 """
 )
 
-comparison = _compute_multistart(int(n_points), int(k), spread, imbalance, int(seed))
 random_summary = comparison.strategies["random"]
 kpp_summary = comparison.strategies["kmeans++"]
 gap = random_summary.mean_inertia - kpp_summary.mean_inertia

@@ -56,6 +56,54 @@ def build_scatter_figure(instance, result, step):
     return fig
 
 
+def build_mini_scatter_figure(instance, result):
+    """Kompakte, legendenlose Variante von build_scatter_figure fuer die Kleinmultiples
+    ("und mit anderen Zufalls-Seeds?"), die immer nur das konvergierte Endergebnis eines
+    Laufs zeigt, keine Zwischenschritte - mehrere davon nebeneinander sollen auf einen
+    Blick vergleichbar sein, nicht einzeln durchgeklickt werden."""
+    import plotly.graph_objects as go
+
+    data = np.array(instance.points)
+    s = result.final_step
+    labels = np.array(s.labels)
+    centers = np.array(s.centers)
+    k = centers.shape[0]
+
+    fig = go.Figure()
+    for i in range(k):
+        mask = labels == i
+        fig.add_trace(
+            go.Scatter(
+                x=data[mask, 0], y=data[mask, 1], mode="markers", showlegend=False,
+                marker=dict(color=CLUSTER_PALETTE[i % len(CLUSTER_PALETTE)], size=5, line=dict(width=0.3, color="white")),
+                hoverinfo="skip",
+            )
+        )
+    fig.add_trace(
+        go.Scatter(
+            x=centers[:, 0], y=centers[:, 1], mode="markers", showlegend=False,
+            marker=dict(
+                symbol="star", size=11,
+                color=[CLUSTER_PALETTE[i % len(CLUSTER_PALETTE)] for i in range(k)],
+                line=dict(width=1, color="#14233B"),
+            ),
+            hoverinfo="skip",
+        )
+    )
+
+    xmin, xmax = data[:, 0].min(), data[:, 0].max()
+    ymin, ymax = data[:, 1].min(), data[:, 1].max()
+    padx = (xmax - xmin) * 0.1 or 1.0
+    pady = (ymax - ymin) * 0.1 or 1.0
+    fig.update_layout(
+        template="plotly_white", height=200,
+        xaxis=dict(visible=False, range=[xmin - padx, xmax + padx], fixedrange=True),
+        yaxis=dict(visible=False, range=[ymin - pady, ymax + pady], fixedrange=True, scaleanchor="x", scaleratio=1),
+        margin=dict(t=5, l=5, r=5, b=5), showlegend=False,
+    )
+    return fig
+
+
 def build_inertia_chart(result, step):
     import plotly.graph_objects as go
 

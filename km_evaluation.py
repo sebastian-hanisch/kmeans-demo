@@ -25,6 +25,8 @@ def stats_at_step(result, step):
 @dataclass(frozen=True)
 class StrategySummary:
     final_inertias: tuple
+    seeds: tuple  # gleicher Index wie final_inertias - erlaubt es der App, einzelne Läufe
+    # aus genau dieser Stichprobe erneut zu berechnen und darzustellen
     best_inertia: float
     mean_inertia: float
     near_best_fraction: float  # Anteil Läufe höchstens NEAR_BEST_TOLERANCE über dem globalen Besten
@@ -60,16 +62,20 @@ def multistart_comparison(data, k, n_restarts, base_seed):
     global_best = min(min(inertias_random), min(inertias_kpp))
     threshold = global_best * (1 + NEAR_BEST_TOLERANCE)
 
-    def summarize(inertias):
+    def summarize(inertias, seeds):
         arr = np.array(inertias)
         return StrategySummary(
             final_inertias=inertias,
+            seeds=tuple(int(s) for s in seeds),
             best_inertia=float(arr.min()),
             mean_inertia=float(arr.mean()),
             near_best_fraction=float(np.mean(arr <= threshold)),
         )
 
     return MultistartComparison(
-        strategies={"random": summarize(inertias_random), "kmeans++": summarize(inertias_kpp)},
+        strategies={
+            "random": summarize(inertias_random, seeds_random),
+            "kmeans++": summarize(inertias_kpp, seeds_kpp),
+        },
         global_best_inertia=global_best,
     )
