@@ -77,6 +77,51 @@ def build_inertia_chart(result, step):
     return fig
 
 
+def build_mean_vs_medoid_illustration():
+    """Statische Illustration (keine Live-Daten, keine Regler) fuer den Mathe-Abschnitt:
+    fuenf eng beieinanderliegende Punkte plus ein einzelner Ausreisser - zeigt, wie weit
+    der quadratisch gezogene Mittelwert von der eigentlichen Punktgruppe wegrutscht,
+    waehrend der Medoid (kleinste Summe an - nicht quadrierten - Abstaenden zu allen
+    anderen) ein echter Punkt mitten in der Gruppe bleibt."""
+    import plotly.graph_objects as go
+
+    points = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0], [0.5, 0.5], [20.0, 20.0]])
+    mean = points.mean(axis=0)
+    dists = np.sqrt(((points[:, None, :] - points[None, :, :]) ** 2).sum(axis=2))
+    medoid = points[dists.sum(axis=1).argmin()]
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=points[:, 0], y=points[:, 1], mode="markers", name="Datenpunkte",
+            marker=dict(color="#9aa6ba", size=10, line=dict(width=1, color="white")),
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=[mean[0]], y=[mean[1]], mode="markers+text", name="Mittelwert",
+            marker=dict(symbol="x", size=14, color="#d62728", line=dict(width=2, color="#d62728")),
+            text=["Mittelwert"], textposition="top center",
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=[medoid[0]], y=[medoid[1]], mode="markers+text", name="Medoid",
+            marker=dict(symbol="star", size=16, color="#1f77b4", line=dict(width=1.5, color="#14233B")),
+            text=["Medoid"], textposition="bottom center",
+        )
+    )
+    fig.update_layout(
+        template="plotly_white", height=320,
+        xaxis=dict(title="x"), yaxis=dict(title="y", scaleanchor="x", scaleratio=1),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
+        margin=dict(t=30, l=10, r=10, b=10),
+    )
+    fig.update_xaxes(fixedrange=True)
+    fig.update_yaxes(fixedrange=True)
+    return fig
+
+
 def build_multistart_distribution_chart(comparison):
     import plotly.graph_objects as go
 

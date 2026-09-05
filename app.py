@@ -27,7 +27,12 @@ from km_presets import (
     sync_query_params,
 )
 from km_scenario import generate_instance
-from km_visualization import build_inertia_chart, build_multistart_distribution_chart, build_scatter_figure
+from km_visualization import (
+    build_inertia_chart,
+    build_mean_vs_medoid_illustration,
+    build_multistart_distribution_chart,
+    build_scatter_figure,
+)
 
 st.set_page_config(page_title="k-Means – Sebastian Hanisch", layout="wide")
 
@@ -291,11 +296,28 @@ Praxis tatsächlich verwendet wird.
 2. **Update**: $c_j \leftarrow \frac{1}{|S_j|} \sum_{x_i \in S_j} x_i$, wobei $S_j$ die
    Punkte mit $\text{label}(x_i) = j$ sind - der Mittelwert minimiert nachweislich
    $\sum_{x_i \in S_j} \lVert x_i - c_j \rVert^2$ innerhalb dieser Gruppe (Ableitung nach
-   $c_j$ gleich Null setzen ergibt genau den Mittelwert). Ersetzt man den Mittelwert durch
-   den nächstgelegenen tatsächlichen Datenpunkt, erhält man **k-Medoids** - robuster
-   gegenüber Ausreißern und mit beliebigen Distanzmaßen nutzbar, aber teurer pro Iteration,
-   da die Medoid-Suche alle Punkte im Cluster gegeneinander prüfen muss.
+   $c_j$ gleich Null setzen ergibt genau den Mittelwert).
 
+**Mittelwert vs. Medoid:** ersetzt man in Schritt 2 den Mittelwert durch den
+nächstgelegenen tatsächlichen Datenpunkt, erhält man **k-Medoids** - mit beliebigen
+Distanzmaßen nutzbar, aber teurer pro Iteration ($O(|S_j|^2)$ statt $O(|S_j|)$ für den
+Mittelwert, da die Medoid-Suche alle Punkte im Cluster gegeneinander prüfen muss). Der
+eigentliche Grund, das überhaupt in Betracht zu ziehen: der Mittelwert geht quadratisch in
+die Zielfunktion ein, ein einzelner extremer Ausreißer kann ihn dadurch beliebig weit von
+der eigentlichen Punktgruppe wegziehen. Der Medoid wird über die Summe der (nicht
+quadrierten) Abstände zu allen anderen Punkten der Gruppe bestimmt - ein Ausreißer kann
+diese Summe nicht annähernd so leicht dominieren.
+
+Ein Beispiel macht das greifbar: fünf eng beieinanderliegende Punkte plus ein einzelner,
+weit entfernter Ausreißer. Der Mittelwert aller sechs Punkte liegt bei (3.75, 3.75) - mitten
+im Leeren, weit außerhalb der eigentlichen Gruppe, weil der Ausreißer ihn dorthin zieht. Der
+Medoid bleibt bei (0.5, 0.5), einem echten Punkt mitten in der dichten Gruppe, weil er dort
+die kleinste Summe an Abständen zu allen anderen erreicht:
+        """
+    )
+    st.plotly_chart(build_mean_vs_medoid_illustration(), width="stretch")
+    st.markdown(
+        r"""
 **Konvergenz:** jeder der beiden Schritte kann die Zielfunktion nur verkleinern oder
 gleich lassen, nie vergrößern. Da es für $n$ Punkte nur endlich viele Partitionen in $k$
 Gruppen gibt, kann sich keine Partition wiederholen, ohne dass der Algorithmus terminiert -
