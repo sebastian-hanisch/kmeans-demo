@@ -277,7 +277,7 @@ mc3.metric(
     "Optimum ist für k-Means NP-schwer zu berechnen, dies ist der praktische Proxy dafür.",
 )
 
-st.plotly_chart(build_multistart_distribution_chart(comparison), width="stretch")
+st.plotly_chart(build_multistart_distribution_chart(comparison), width="stretch", key="multistart_distribution")
 
 if gap > comparison.global_best_inertia * 0.05:
     st.success(
@@ -337,7 +337,7 @@ Medoid bleibt bei (0.5, 0.5), einem echten Punkt mitten in der dichten Gruppe, w
 die kleinste Summe an Abständen zu allen anderen erreicht:
         """
     )
-    st.plotly_chart(build_mean_vs_medoid_illustration(), width="stretch")
+    st.plotly_chart(build_mean_vs_medoid_illustration(), width="stretch", key="mean_vs_medoid")
     st.markdown(
         r"""
 **Konvergenz:** jeder der beiden Schritte kann die Zielfunktion nur verkleinern oder
