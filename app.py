@@ -291,7 +291,10 @@ Praxis tatsächlich verwendet wird.
 2. **Update**: $c_j \leftarrow \frac{1}{|S_j|} \sum_{x_i \in S_j} x_i$, wobei $S_j$ die
    Punkte mit $\text{label}(x_i) = j$ sind - der Mittelwert minimiert nachweislich
    $\sum_{x_i \in S_j} \lVert x_i - c_j \rVert^2$ innerhalb dieser Gruppe (Ableitung nach
-   $c_j$ gleich Null setzen ergibt genau den Mittelwert).
+   $c_j$ gleich Null setzen ergibt genau den Mittelwert). Ersetzt man den Mittelwert durch
+   den nächstgelegenen tatsächlichen Datenpunkt, erhält man **k-Medoids** - robuster
+   gegenüber Ausreißern und mit beliebigen Distanzmaßen nutzbar, aber teurer pro Iteration,
+   da die Medoid-Suche alle Punkte im Cluster gegeneinander prüfen muss.
 
 **Konvergenz:** jeder der beiden Schritte kann die Zielfunktion nur verkleinern oder
 gleich lassen, nie vergrößern. Da es für $n$ Punkte nur endlich viele Partitionen in $k$
