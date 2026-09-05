@@ -10,11 +10,11 @@ quadrierten Entfernungen zu minimieren ist exakt die k-Means-Zielfunktion.
 
 Die Konzepte-Reihe ist kein linearer Pfad, sondern mehrere unabhängige Linien: diese Demo
 ist der Startpunkt einer eigenen **Clustering-Linie**, unabhängig von
-[branch-bound-demo](../branch-bound-demo)s Exakte-Suche-Linie. Geplante Fortsetzung dieser
-Linie: **DBSCAN**, motiviert durch zwei konkrete Schwächen von k-Means, die DBSCAN behebt
-(k muss nicht vorab feststehen, Cluster müssen nicht konvex/kugelförmig sein) – danach
-**HDBSCAN**, motiviert durch DBSCANs eigene Schwäche bei Clustern sehr unterschiedlicher
-Dichte (ein einzelnes globales `eps` reicht dann nicht mehr).
+[branch-bound-demo](../branch-bound-demo)s Exakte-Suche-Linie. Fortsetzung dieser Linie:
+[dbscan-demo](../dbscan-demo), motiviert durch zwei konkrete Schwächen von k-Means, die
+DBSCAN behebt (k muss nicht vorab feststehen, Cluster müssen nicht konvex/kugelförmig
+sein) – geplant danach **HDBSCAN**, motiviert durch DBSCANs eigene Schwäche bei Clustern
+sehr unterschiedlicher Dichte (ein einzelnes globales `eps` reicht dann nicht mehr).
 
 ## Warum diese Demo anders aufgebaut ist
 
