@@ -12,11 +12,24 @@ quadrierten Entfernungen zu minimieren ist exakt die k-Means-Zielfunktion.
 
 Die Konzepte-Reihe ist kein linearer Pfad, sondern mehrere unabhängige Linien: diese Demo
 ist der Startpunkt einer eigenen **Clustering-Linie**, unabhängig von
-[branch-bound-demo](../branch-bound-demo)s Exakte-Suche-Linie. Fortsetzung dieser Linie:
-[dbscan-demo](../dbscan-demo), motiviert durch zwei konkrete Schwächen von k-Means, die
-DBSCAN behebt (k muss nicht vorab feststehen, Cluster müssen nicht konvex/kugelförmig
-sein) – geplant danach **HDBSCAN**, motiviert durch DBSCANs eigene Schwäche bei Clustern
-sehr unterschiedlicher Dichte (ein einzelnes globales `eps` reicht dann nicht mehr).
+[branch-bound-demo](../branch-bound-demo)s Exakte-Suche-Linie - und verzweigt sich hier in
+zwei unabhängige Äste:
+
+```
+kmeans-demo → dbscan-demo ──┐
+                             ├──> hdbscan-demo
+              agglomerative-demo ──────────┘
+kmeans-demo → gmm-demo
+```
+
+Ein Ast behebt k-Means' **dichte-/verbindungsbasierte** Schwächen: [dbscan-demo](../dbscan-demo)
+(k muss nicht vorab feststehen, Cluster müssen nicht konvex/kugelförmig sein) und, davon
+unabhängig, [agglomerative-demo](../agglomerative-demo) (Chaining bei Single-Linkage) -
+beide laufen auf [hdbscan-demo](../hdbscan-demo) zu, das live nachweist, dass HDBSCAN beide
+Probleme löst. Der zweite, unabhängige Ast behebt eine ANDERE Schwäche - die implizite
+Annahme kugelförmiger, gleich gestreuter Cluster und harter Zuweisung:
+[gmm-demo](../gmm-demo) (Gaussian Mixture Models, EM-Algorithmus), bei dem k-Means selbst
+der Grenzfall ist (kugelförmige, gleiche Varianz, harte statt weicher Zuweisung).
 
 ## Warum diese Demo anders aufgebaut ist
 
