@@ -1,5 +1,7 @@
 # k-Means für die Standortwahl von Depots – Streamlit-Demo
 
+**[→ Demo live ausprobieren](https://sebastianhanisch-kmeans-demo.streamlit.app/)**
+
 Zweites Stück der "Konzepte"-Reihe für die Website "Sebastian Hanisch – Operations Research
 und Machine Learning" (nach [branch-bound-demo](../branch-bound-demo)): anders als die
 Fall-Demos im Portfolio (ein Anwendungsfall, mehrere Verfahren im Vergleich) zeigt diese
