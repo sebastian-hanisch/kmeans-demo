@@ -19,17 +19,23 @@ zwei unabhängige Äste:
 kmeans-demo → dbscan-demo ──┐
                              ├──> hdbscan-demo
               agglomerative-demo ──────────┘
-kmeans-demo → gmm-demo
+kmeans-demo → gmm-demo → dpmm-demo
+kmeans-demo → spectral-demo
 ```
 
 Ein Ast behebt k-Means' **dichte-/verbindungsbasierte** Schwächen: [dbscan-demo](../dbscan-demo)
 (k muss nicht vorab feststehen, Cluster müssen nicht konvex/kugelförmig sein) und, davon
 unabhängig, [agglomerative-demo](../agglomerative-demo) (Chaining bei Single-Linkage) -
 beide laufen auf [hdbscan-demo](../hdbscan-demo) zu, das live nachweist, dass HDBSCAN beide
-Probleme löst. Der zweite, unabhängige Ast behebt eine ANDERE Schwäche - die implizite
+Probleme löst. Ein zweiter, unabhängiger Ast behebt eine ANDERE Schwäche - die implizite
 Annahme kugelförmiger, gleich gestreuter Cluster und harter Zuweisung:
 [gmm-demo](../gmm-demo) (Gaussian Mixture Models, EM-Algorithmus), bei dem k-Means selbst
-der Grenzfall ist (kugelförmige, gleiche Varianz, harte statt weicher Zuweisung).
+der Grenzfall ist, fortgesetzt von [dpmm-demo](../dpmm-demo) (Dirichlet-Process-Mixture),
+das auch dort noch die feste Clusterzahl k über Bayesianische Nichtparametrik auflöst. Ein
+dritter, unabhängiger Ast behebt NUR die Nicht-Konvexitäts-Annahme über einen völlig
+anderen Werkzeugkasten: [spectral-demo](../spectral-demo) (Spectral Clustering, Graph-
+Laplace-Matrix + Eigenzerlegung) - ein ehrlicher Kontrast zu DBSCAN, da k dabei weiterhin
+vorab feststehen muss.
 
 ## Warum diese Demo anders aufgebaut ist
 
