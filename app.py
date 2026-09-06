@@ -174,11 +174,15 @@ st.markdown("## 🎯 Lloyd's Algorithmus in Aktion")
 
 step_col, play_col = st.columns([5, 1])
 with step_col:
-    step = st.slider(
-        "Schritt (Iteration)", 0, max_step, key="km_step",
-        help="Schritt 0 = erste Zuweisung nach der Initialisierung, danach je ein "
-        "vollständiger Update-dann-Zuweisung-Zyklus.",
-    )
+    if max_step == 0:
+        step = 0
+        st.caption("Bereits nach der ersten Zuweisung konvergiert - kein Regler nötig.")
+    else:
+        step = st.slider(
+            "Schritt (Iteration)", 0, max_step, key="km_step",
+            help="Schritt 0 = erste Zuweisung nach der Initialisierung, danach je ein "
+            "vollständiger Update-dann-Zuweisung-Zyklus.",
+        )
 with play_col:
     auto_play = st.button("▶️ Abspielen", width="stretch")
 
