@@ -20,7 +20,7 @@ kmeans-demo → dbscan-demo ──┐
                              ├──> hdbscan-demo
               agglomerative-demo ──────────┘
 kmeans-demo → gmm-demo → dpmm-demo
-kmeans-demo → spectral-demo
+kmeans-demo → spectral-demo → leiden-demo
 kmeans-demo ─┐
              ├──> divisive-demo
 agglomerative-demo ─┘
@@ -38,9 +38,13 @@ das auch dort noch die feste Clusterzahl k über Bayesianische Nichtparametrik a
 dritter, unabhängiger Ast behebt NUR die Nicht-Konvexitäts-Annahme über einen völlig
 anderen Werkzeugkasten: [spectral-demo](../spectral-demo) (Spectral Clustering, Graph-
 Laplace-Matrix + Eigenzerlegung) - ein ehrlicher Kontrast zu DBSCAN, da k dabei weiterhin
-vorab feststehen muss. [divisive-demo](../divisive-demo) (Bisecting k-Means) behebt gar
-keine Schwäche - es ist ein bewusster Kontrast zu agglomerative-demo: dieselbe Art
-Hierarchie, top-down statt bottom-up gebaut, mit eigenen Kompromissen.
+vorab feststehen muss. [leiden-demo](../leiden-demo) setzt diesen Ast fort und behebt
+auch dort noch die feste Clusterzahl k - über Modularitätsoptimierung (Leiden-
+Algorithmus, dem De-facto-Standard der Netzwerk-Community-Detection) statt über
+Dichte oder Bayesianische Nichtparametrik. [divisive-demo](../divisive-demo) (Bisecting
+k-Means) behebt gar keine Schwäche - es ist ein bewusster Kontrast zu
+agglomerative-demo: dieselbe Art Hierarchie, top-down statt bottom-up gebaut, mit
+eigenen Kompromissen.
 
 ## Warum diese Demo anders aufgebaut ist
 
