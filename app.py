@@ -39,15 +39,15 @@ st.set_page_config(page_title="k-Means – Sebastian Hanisch", layout="wide")
 
 
 @st.cache_data(show_spinner=False)
-def _compute_run(n_points, k, spread, imbalance, seed, init_strategy):
-    instance = generate_instance(n_points, k, spread, imbalance, seed)
+def _compute_run(n_points, k, spread, imbalance, shape, seed, init_strategy):
+    instance = generate_instance(n_points, k, spread, imbalance, seed, shape=shape)
     result = run(instance.as_array(), k, init_strategy, seed)
     return instance, result
 
 
 @st.cache_data(show_spinner=False)
-def _compute_multistart(n_points, k, spread, imbalance, seed):
-    instance = generate_instance(n_points, k, spread, imbalance, seed)
+def _compute_multistart(n_points, k, spread, imbalance, shape, seed):
+    instance = generate_instance(n_points, k, spread, imbalance, seed, shape=shape)
     return multistart_comparison(instance.as_array(), k, C.N_RESTARTS_MULTISTART, base_seed=seed)
 
 
@@ -112,6 +112,7 @@ PRESET_HELP = {
     "Mittlere Schwierigkeit (etwas Überlappung)": "4 Gruppen mit spürbarer Überlappung - der Unterschied zwischen den Start-Strategien wird deutlicher sichtbar.",
     "Schwerer Fall (ungleiche Gruppengrößen)": "5 Gruppen, eine davon groß und diffus, die übrigen klein und dicht - Zufalls-Init scheitert hier reproduzierbar öfter an einem schlechten lokalen Optimum.",
     "Viele Gruppen (Suchraum wächst mit k)": "8 Gruppen - je mehr Depots gesucht werden, desto mehr mögliche Start-Kombinationen gibt es, und desto häufiger trifft reine Zufalls-Init eine schlechte.",
+    "Nicht-konvexe Formen (k-Means scheitert)": "Zwei ineinander verschlungene Halbmonde - k-Means kann sie grundsätzlich nicht sauber trennen, unabhängig von der Start-Strategie, weil beide Gruppen nicht konvex sind.",
 }
 preset_cols = st.columns(len(C.PRESETS))
 for i, name in enumerate(C.PRESETS.keys()):
@@ -142,6 +143,14 @@ with st.sidebar:
     )
     seed = st.number_input("Zufalls-Seed", *bounds("seed_input"), key="seed_input", step=1)
 
+    st.markdown("**Punktwolken-Form**")
+    shape = st.radio(
+        "Form", options=C.SHAPES, key="shape_radio", format_func=lambda s: C.SHAPE_LABELS[s],
+        help="„Gruppen“: runde, konvexe Cluster - genau die Annahme, auf der k-Means beruht. "
+        "„Halbmonde“: nicht-konvexe Bögen, die k-Means grundsätzlich nicht sauber trennen "
+        "kann (siehe dbscan-demo/spectral-demo für Verfahren, die das beheben).",
+    )
+
     st.markdown("**Suchverhalten**")
     init_strategy = st.radio(
         "Start-Strategie (für die Animation unten)",
@@ -158,14 +167,14 @@ with st.sidebar:
         help="Würfelt einen neuen Zufalls-Seed für die Kundenstandorte.",
     )
 
-sync_query_params(n_points, k, spread, imbalance, seed, init_strategy)
+sync_query_params(n_points, k, spread, imbalance, seed, shape, init_strategy)
 
 with st.spinner("Führe Lloyd's Algorithmus aus..."):
-    instance, result = _compute_run(int(n_points), int(k), spread, imbalance, int(seed), init_strategy)
-    comparison = _compute_multistart(int(n_points), int(k), spread, imbalance, int(seed))
+    instance, result = _compute_run(int(n_points), int(k), spread, imbalance, shape, int(seed), init_strategy)
+    comparison = _compute_multistart(int(n_points), int(k), spread, imbalance, shape, int(seed))
 
 max_step = len(result.steps) - 1
-run_key = (n_points, k, spread, imbalance, seed, init_strategy)
+run_key = (n_points, k, spread, imbalance, shape, seed, init_strategy)
 if "km_step" not in st.session_state or st.session_state.get("km_step_owner") != run_key:
     st.session_state["km_step"] = max_step
     st.session_state["km_step_owner"] = run_key

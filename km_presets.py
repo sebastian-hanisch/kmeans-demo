@@ -24,12 +24,17 @@ def _init_strategy_caster(v):
     return v if v in C.INIT_STRATEGIES else C.DEFAULT_INIT_STRATEGY
 
 
+def _shape_caster(v):
+    return v if v in C.SHAPES else C.DEFAULT_SHAPE
+
+
 SETTING_SPECS = {
     "n_points_slider": SettingSpec("n", int, C.DEFAULT_N_POINTS, C.N_POINTS_MIN, C.N_POINTS_MAX),
     "k_slider": SettingSpec("k", int, C.DEFAULT_K, C.K_MIN, C.K_MAX),
     "spread_slider": SettingSpec("spread", float, C.DEFAULT_SPREAD, C.SPREAD_MIN, C.SPREAD_MAX),
     "imbalance_slider": SettingSpec("imb", float, C.DEFAULT_IMBALANCE, C.IMBALANCE_MIN, C.IMBALANCE_MAX),
     "seed_input": SettingSpec("seed", int, C.DEFAULT_SEED, 0, 2_000_000_000),
+    "shape_radio": SettingSpec("shape", _shape_caster, C.DEFAULT_SHAPE),
     "init_strategy_radio": SettingSpec("init", _init_strategy_caster, C.DEFAULT_INIT_STRATEGY),
 }
 
@@ -65,13 +70,14 @@ def load_permalink_settings():
     st.session_state["permalink_loaded"] = True
 
 
-def sync_query_params(n_points, k, spread, imbalance, seed, init_strategy):
+def sync_query_params(n_points, k, spread, imbalance, seed, shape, init_strategy):
     try:
         st.query_params["n"] = str(int(n_points))
         st.query_params["k"] = str(int(k))
         st.query_params["spread"] = str(spread)
         st.query_params["imb"] = str(imbalance)
         st.query_params["seed"] = str(int(seed))
+        st.query_params["shape"] = shape
         st.query_params["init"] = init_strategy
     except Exception:
         pass
@@ -83,6 +89,7 @@ def apply_preset(name):
     st.session_state["k_slider"] = p["k"]
     st.session_state["spread_slider"] = p["spread"]
     st.session_state["imbalance_slider"] = p["imbalance"]
+    st.session_state["shape_radio"] = p["shape"]
     st.session_state["seed_input"] = p["seed"]
 
 

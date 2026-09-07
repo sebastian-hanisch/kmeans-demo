@@ -43,3 +43,55 @@ def test_imbalance_makes_cluster_zero_larger():
     counts = np.bincount(labels, minlength=5)
     assert counts[0] == counts.max()
     assert counts[0] > counts[1:].mean() * 2
+
+
+def test_default_shape_is_blobs():
+    instance = generate_instance(n_points=60, k=3, spread=0.2, imbalance=0.0, seed=1)
+    assert instance.shape == "blobs"
+
+
+def test_moons_shape_produces_two_balanced_groups():
+    instance = generate_instance(
+        n_points=100, k=2, spread=0.08, imbalance=0.0, seed=5, shape="moons"
+    )
+    assert instance.shape == "moons"
+    labels = np.array(instance.true_labels)
+    counts = np.bincount(labels, minlength=2)
+    assert counts[0] == 50 and counts[1] == 50
+
+
+def test_moons_shape_with_k_greater_than_two_produces_k_balanced_arcs():
+    instance = generate_instance(
+        n_points=200, k=4, spread=0.08, imbalance=0.0, seed=6, shape="moons"
+    )
+    labels = np.array(instance.true_labels)
+    counts = np.bincount(labels, minlength=4)
+    assert counts.min() == counts.max() == 50
+
+
+def test_moons_shape_is_not_convex_like_blobs():
+    """Bei "moons" muss jeder Punkt einer Gruppe naeher an SEINEM eigenen wahren Zentrum
+    liegen als bei einer zufaelligen Zuordnung - aber die Gruppen selbst sind bewusst
+    NICHT durch ihr Zentrum trennbar (der ganze Punkt der Form): ein Punkt am einen Ende
+    eines Halbmonds kann durchaus naeher am Zentrum des ANDEREN Halbmonds liegen als am
+    eigenen. Das unterscheidet moons strukturell von blobs, wo test_low_spread_clusters_
+    are_well_separated_from_true_centers exakt das Gegenteil verlangt."""
+    instance = generate_instance(
+        n_points=100, k=2, spread=0.08, imbalance=0.0, seed=5, shape="moons"
+    )
+    points = np.array(instance.points)
+    true_centers = np.array(instance.true_centers)
+    labels = np.array(instance.true_labels)
+    d2 = ((points[:, None, :] - true_centers[None, :, :]) ** 2).sum(axis=2)
+    nearest_center = d2.argmin(axis=1)
+    misassigned_fraction = np.mean(nearest_center != labels)
+    assert misassigned_fraction > 0.05
+
+
+def test_imbalance_makes_group_zero_larger_for_moons_too():
+    instance = generate_instance(
+        n_points=200, k=2, spread=0.08, imbalance=0.9, seed=7, shape="moons"
+    )
+    labels = np.array(instance.true_labels)
+    counts = np.bincount(labels, minlength=2)
+    assert counts[0] > counts[1]
