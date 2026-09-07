@@ -48,7 +48,7 @@ def _compute_run(n_points, k, spread, imbalance, shape, seed, init_strategy):
 @st.cache_data(show_spinner=False)
 def _compute_multistart(n_points, k, spread, imbalance, shape, seed):
     instance = generate_instance(n_points, k, spread, imbalance, seed, shape=shape)
-    return multistart_comparison(instance.as_array(), k, C.N_RESTARTS_MULTISTART, base_seed=seed)
+    return multistart_comparison(instance.as_array(), k, C.N_RESTARTS_MULTISTART, base_seed=C.COMPARISON_SEED)
 
 
 @st.cache_data(show_spinner=False)

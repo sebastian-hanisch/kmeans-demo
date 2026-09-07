@@ -23,6 +23,12 @@ MAX_ITERATIONS = 50
 N_RESTARTS_MULTISTART = 40
 NEAR_BEST_TOLERANCE = 0.01  # 1% über der besten gefundenen Inertia gilt noch als "nahe am Besten"
 
+# Fester Seed für die Restart-Stichprobe des Multistart-Vergleichs - bewusst UNABHÄNGIG
+# vom Szenario-Seed des Reglers (Lehre aus gmm-demo/dpmm-demo: Vergleichs-Randomness nie
+# an den Szenario-Seed koppeln, sonst ändert ein neuer Szenario-Seed unbeabsichtigt auch
+# die Restart-Stichprobe und macht den Vergleich instabil).
+COMPARISON_SEED = 1
+
 INIT_STRATEGIES = ("random", "kmeans++")
 INIT_STRATEGY_LABELS = {
     "random": "Zufällige Startpunkte",
