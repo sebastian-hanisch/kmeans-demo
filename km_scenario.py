@@ -21,6 +21,7 @@ class ClusteringInstance:
     true_centers: tuple  # ((x, y), ...), k Einträge - bei "moons" der Schwerpunkt je Bogen
     shape: str  # "blobs" oder "moons"
     k: int
+    n_outliers: int = 0  # die letzten n_outliers Punkte sind weit entfernte Ausreißer (true_labels = -1)
 
     @property
     def n_points(self):
@@ -127,7 +128,19 @@ def _generate_moons(n_points, k, spread, imbalance, rng):
     return points, labels, true_centers
 
 
-def generate_instance(n_points, k, spread, imbalance, seed, shape="blobs"):
+OUTLIER_MIN_FACTOR, OUTLIER_MAX_FACTOR = 2.5, 3.5  # Abstand der Ausreißer vom Ursprung in Vielfachen der größten Punktentfernung
+
+
+def _outliers(points, n_outliers, rng):
+    """Weit entfernte Ausreißer auf einem Ring um den Ursprung (Richtung und Abstand zufällig). Sie werden NACH allen
+    übrigen Zufallszügen erzeugt: mit n_outliers = 0 ändert sich an der Instanz nichts (bitgleich wie früher)."""
+    extent = float(np.linalg.norm(points, axis=1).max()) or 1.0
+    angles = rng.uniform(0, 2 * np.pi, size=n_outliers)
+    radii = rng.uniform(OUTLIER_MIN_FACTOR, OUTLIER_MAX_FACTOR, size=n_outliers) * extent
+    return np.stack([radii * np.cos(angles), radii * np.sin(angles)], axis=1)
+
+
+def generate_instance(n_points, k, spread, imbalance, seed, shape="blobs", n_outliers=0):
     """spread in [0.1, 0.9] steuert je nach shape entweder die Überlappung der Cluster
     relativ zum Ring-Radius ("blobs") oder das Rauschen um die ideale Bogen-Kurve
     ("moons"). imbalance in [0, 1] macht Gruppe 0 zunehmend größer und diffuser als die
@@ -139,10 +152,15 @@ def generate_instance(n_points, k, spread, imbalance, seed, shape="blobs"):
     else:
         points, labels, true_centers = _generate_blobs(n_points, k, spread, imbalance, rng)
 
+    if n_outliers > 0:
+        points = np.concatenate([points, _outliers(points, n_outliers, rng)], axis=0)
+        labels = np.concatenate([labels, np.full(n_outliers, -1)])
+
     return ClusteringInstance(
         points=tuple(map(tuple, points.tolist())),
         true_labels=tuple(int(l) for l in labels),
         true_centers=tuple(map(tuple, true_centers.tolist())),
         shape=shape,
         k=k,
+        n_outliers=int(n_outliers),
     )

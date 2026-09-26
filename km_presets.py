@@ -28,6 +28,10 @@ def _shape_caster(v):
     return v if v in C.SHAPES else C.DEFAULT_SHAPE
 
 
+def _center_caster(v):
+    return v if v in C.CENTER_TYPES else C.DEFAULT_CENTER
+
+
 SETTING_SPECS = {
     "n_points_slider": SettingSpec("n", int, C.DEFAULT_N_POINTS, C.N_POINTS_MIN, C.N_POINTS_MAX),
     "k_slider": SettingSpec("k", int, C.DEFAULT_K, C.K_MIN, C.K_MAX),
@@ -36,6 +40,8 @@ SETTING_SPECS = {
     "seed_input": SettingSpec("seed", int, C.DEFAULT_SEED, 0, 2_000_000_000),
     "shape_radio": SettingSpec("shape", _shape_caster, C.DEFAULT_SHAPE),
     "init_strategy_radio": SettingSpec("init", _init_strategy_caster, C.DEFAULT_INIT_STRATEGY),
+    "center_radio": SettingSpec("center", _center_caster, C.DEFAULT_CENTER),
+    "outliers_slider": SettingSpec("out", int, C.DEFAULT_OUTLIERS, C.OUTLIERS_MIN, C.OUTLIERS_MAX),
 }
 
 
@@ -70,7 +76,7 @@ def load_permalink_settings():
     st.session_state["permalink_loaded"] = True
 
 
-def sync_query_params(n_points, k, spread, imbalance, seed, shape, init_strategy):
+def sync_query_params(n_points, k, spread, imbalance, seed, shape, init_strategy, center=C.DEFAULT_CENTER, outliers=C.DEFAULT_OUTLIERS):
     try:
         st.query_params["n"] = str(int(n_points))
         st.query_params["k"] = str(int(k))
@@ -79,6 +85,8 @@ def sync_query_params(n_points, k, spread, imbalance, seed, shape, init_strategy
         st.query_params["seed"] = str(int(seed))
         st.query_params["shape"] = shape
         st.query_params["init"] = init_strategy
+        st.query_params["center"] = center
+        st.query_params["out"] = str(int(outliers))
     except Exception:
         pass
 
@@ -91,6 +99,8 @@ def apply_preset(name):
     st.session_state["imbalance_slider"] = p["imbalance"]
     st.session_state["shape_radio"] = p["shape"]
     st.session_state["seed_input"] = p["seed"]
+    st.session_state["center_radio"] = p.get("center", C.DEFAULT_CENTER)
+    st.session_state["outliers_slider"] = p.get("outliers", C.DEFAULT_OUTLIERS)
 
 
 def randomize_seed():

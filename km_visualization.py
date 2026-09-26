@@ -10,6 +10,22 @@ CLUSTER_PALETTE = [
 ]
 
 
+def _add_outlier_markers(fig, instance, data, size):
+    """Ausreißer (die letzten n_outliers Punkte) bekommen ein schwarzes Kreuz über ihrer Cluster-Farbe."""
+    import plotly.graph_objects as go
+
+    n_out = getattr(instance, "n_outliers", 0)
+    if n_out:
+        out = data[-n_out:]
+        fig.add_trace(
+            go.Scatter(
+                x=out[:, 0], y=out[:, 1], mode="markers", name="Ausreißer", showlegend=size > 8,
+                marker=dict(symbol="x-thin", size=size + 4, color="#14233B", line=dict(width=1.5, color="#14233B")),
+                hoverinfo="skip",
+            )
+        )
+
+
 def build_scatter_figure(instance, result, step):
     import plotly.graph_objects as go
 
@@ -30,6 +46,7 @@ def build_scatter_figure(instance, result, step):
                 hoverinfo="skip",
             )
         )
+    _add_outlier_markers(fig, instance, data, 9)
     fig.add_trace(
         go.Scatter(
             x=centers[:, 0], y=centers[:, 1], mode="markers", name="Zentren",
@@ -79,6 +96,7 @@ def build_mini_scatter_figure(instance, result):
                 hoverinfo="skip",
             )
         )
+    _add_outlier_markers(fig, instance, data, 6)
     fig.add_trace(
         go.Scatter(
             x=centers[:, 0], y=centers[:, 1], mode="markers", showlegend=False,
@@ -107,8 +125,10 @@ def build_mini_scatter_figure(instance, result):
 def build_inertia_chart(result, step):
     import plotly.graph_objects as go
 
+    from km_constants import OBJECTIVE_AXIS_LABELS
+
     xs = [s.iteration for s in result.steps if s.iteration <= step]
-    ys = [s.inertia for s in result.steps if s.iteration <= step]
+    ys = [s.objective for s in result.steps if s.iteration <= step]
 
     fig = go.Figure()
     fig.add_trace(
@@ -117,7 +137,7 @@ def build_inertia_chart(result, step):
     )
     fig.update_layout(
         template="plotly_white", height=280,
-        xaxis_title="Iteration", yaxis_title="Inertia (Summe quadrierter Abstände)",
+        xaxis_title="Iteration", yaxis_title=OBJECTIVE_AXIS_LABELS[result.center],
         showlegend=False, margin=dict(t=20, l=10, r=10, b=10),
     )
     fig.update_xaxes(fixedrange=True)
@@ -170,8 +190,10 @@ def build_mean_vs_medoid_illustration():
     return fig
 
 
-def build_multistart_distribution_chart(comparison):
+def build_multistart_distribution_chart(comparison, center="mean"):
     import plotly.graph_objects as go
+
+    from km_constants import OBJECTIVE_LABELS
 
     fig = go.Figure()
     for key, label, color in [
@@ -190,7 +212,7 @@ def build_multistart_distribution_chart(comparison):
         annotation_text="Bestes gefundenes Ergebnis", annotation_position="top left",
     )
     fig.update_layout(
-        template="plotly_white", height=320, yaxis_title="Finale Inertia nach Konvergenz",
+        template="plotly_white", height=320, yaxis_title="Finale Inertia nach Konvergenz" if center == "mean" else f"Finale Zielgröße nach Konvergenz ({OBJECTIVE_LABELS[center]})",
         showlegend=False, margin=dict(t=30, l=10, r=10, b=10),
     )
     fig.update_yaxes(fixedrange=True)

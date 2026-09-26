@@ -97,6 +97,24 @@ Sektion führt live 40 unabhängige Läufe je Start-Strategie auf dem aktuellen 
 und vergleicht die Verteilung der jeweils erreichten finalen Inertia – nicht nur behauptet,
 sondern für jedes Szenario frisch nachgerechnet.
 
+## Neu (2026-09-26): Mittelwert oder Medoid (k-Medoids)
+
+Bisher wurde k-Medoids in der App nur **erklärt** (Abschnitt „Mittelwert vs. Medoid“ mit einer statischen Grafik). Jetzt lässt sich das **Zentrum** jedes Clusters umschalten: **Mittelwert** (k-Means, minimiert die Summe quadrierter Abstände) oder **Medoid** (k-Medoids, der zentralste echte Datenpunkt, minimiert die Summe der Abstände; Voronoi-Iteration). Dazu kommt ein Regler **Ausreißer** (0 bis 10 weit entfernte Punkte). Standard ist unverändert (Mittelwert, keine Ausreißer): alle bisherigen Zahlen und Presets gelten weiter, der Mittelwert-Modus liefert Schritt für Schritt bitgleich die früheren Ergebnisse (Test).
+Alle Zahlen dieses Abschnitts sind in `tests/test_claims.py` belegt (Preset-Instanz: 120 Punkte, 3 Gruppen, Streuung 0,25, 5 Ausreißer, Seed 3; Verteilungen über 40 feste Netze ab Seed 100000; Werte sind das beste von 10 Läufen, Zentren-Verschiebung in Karteneinheiten).
+
+**Ein Ausreißer zieht den Mittelwert – der Medoid bleibt.** Preset-Instanz: der Mittelwert gibt ein Zentrum an die Ausreißer ab und verschmilzt zwei echte Gruppen (Zentren im Mittel **4,87** gegenüber der Lösung ohne Ausreißer verschoben, **33,3 %** der echten Punkte falsch zugeordnet), der Medoid bleibt in den echten Gruppen (Verschiebung **0,00**, **0 %** falsch). Jedes Verfahren gewinnt in seinem eigenen Maß: Summe der Abstände 176,3 (Medoid) gegen 273,6 (Mittelwert), Inertia 1 004,5 gegen 873,7.
+Über 40 Netze mit 1 / 3 / 5 / 10 Ausreißern: mittlere Verschiebung der Zentren **Mittelwert 0,106 / 0,578 / 0,836 / 3,573, Medoid 0,011 / 0,050 / 0,075 / 2,056** (Median Mittelwert 0,106 / 0,287 / 0,469 / 4,689, Medoid 0,000 / 0,000 / 0,014 / 0,220); der Medoid wird in 37 / 40 / 40 / 33 von 40 Netzen weniger verschoben. Falsch zugeordnete echte Punkte im Mittel: Mittelwert 0,1 / 1,8 / 2,7 / 21,8 %, Medoid 0,1 / 0,1 / 0,1 / 12,6 % (schlechtestes Netz bei 3 Ausreißern 33,3 % gegen 0,8 %).
+
+**Was der Medoid kostet.** Auf sauberen Daten (40 Netze ohne Ausreißer) hat die Medoid-Lösung im Mittel die **1,031-fache Inertia** des Mittelwerts (höchstens 1,081, in allen 40 Netzen größer), der Mittelwert dagegen nur die 0,9955-fache Summe der Abstände des Medoids (er darf zwischen die Punkte gehen); beide brauchen im Mittel 1,4 Iterationen. Der Medoid-Update prüft alle Punktpaare im Cluster: O(|S|²) statt O(|S|).
+
+**Die Medoid-Heuristik gegen den exakten p-Median.** k-Medoids ist das p-Median-Problem der Standortplanungs-Linie; die Demo löst es auf Abruf (bis 80 Punkte) exakt per MILP (HiGHS). 40 Netze mit 60 Punkten: ein Lauf mit k-Means++-Start liegt im Mittel beim **1,024-fachen** (3 Gruppen) bzw. **1,081-fachen** (5 Gruppen) des Optimums, mit Zufalls-Start 1,117 bzw. 1,097; das **beste von 40 Läufen trifft das Optimum in 40 bzw. 39 von 40 Netzen**. Die k-Means-Lösung (Mittelwert-Zentren, frei liegend) hat 0,998 bzw. 1,006 der Optimalsumme (0,976 bis 1,025).
+
+**Was nicht wie erwartet ausfiel.**
+- **„k-Means++ ist immer die bessere Start-Strategie“ – mit Ausreißern nicht.** In der Preset-Instanz mit dem Medoid liegt die mittlere Summe der Abstände bei Zufalls-Start bei 198,7, bei k-Means++ bei 254,6 (nahe am Besten in 80 % gegen 35 % der Läufe): k-Means++ wählt die weit entfernten Ausreißer bevorzugt als Startpunkte.
+- **„Der Medoid rettet nicht-konvexe Formen“ – nein.** Halbmonde (k = 2): Fehlzuordnung 25,4 % (Mittelwert) gegen 23,9 % (Medoid), beide scheitern.
+- **„Der Medoid ist bei vielen Ausreißern immun“ – nein.** Bei 10 Ausreißern (8 % der Punkte) verschiebt er die Zentren im Mittel immer noch um 2,06 und ordnet 12,6 % falsch zu (schlechtestes Netz 34,2 %): auch ein Medoid kann zum Ausreißer abwandern, wenn die Ausreißer eine eigene Gruppe bilden.
+- **Voronoi-Iteration ist kein PAM.** Die hier gerechnete Heuristik tauscht nicht gezielt Medoide gegen andere Punkte; ein Einzellauf ist deshalb im Mittel 2 bis 12 % über dem Optimum, erst mehrere Starts nähern sich ihm.
+
 ## Sicherheitsgrenzen
 
 `MAX_ITERATIONS` (50) begrenzt Lloyd's Algorithmus pro Lauf – bei normalen Szenariogrößen
@@ -129,10 +147,11 @@ Stattdessen drei unabhängige Prüfungen:
 | `km_constants.py` | Defaults, Regler-Grenzen, Sicherheitsgrenzen, `PRESETS` |
 | `km_presets.py` | `SettingSpec`/`SETTING_SPECS`, Permalink-Logik, Presets, Zufalls-Seed-Button |
 | `km_scenario.py` | Zufällige Kundenpunktwolken mit einstellbarer Überlappung und Größen-Ungleichgewicht |
-| `km_algorithm.py` | Lloyd's Algorithmus from scratch (Zufalls- und k-Means++-Init) mit vollständigem Iterations-Protokoll |
-| `km_evaluation.py` | Live-Kennzahlen pro Schritt, Multistart-Vergleich beider Start-Strategien |
+| `km_algorithm.py` | Lloyd's Algorithmus from scratch (Zufalls- und k-Means++-Init, Zentrum Mittelwert oder Medoid) mit vollständigem Iterations-Protokoll |
+| `km_exact.py` | exakter p-Median per MILP (HiGHS) als Referenz für die Medoid-Heuristik, bis 80 Punkte |
+| `km_evaluation.py` | Live-Kennzahlen pro Schritt, Multistart-Vergleich beider Start-Strategien, Mittelwert-gegen-Medoid-Vergleich und Ausreißer-Experiment |
 | `km_visualization.py` | Punktwolken-, Inertia- und Verteilungs-Diagramm (Plotly) |
-| `tests/` | Monotonie, Handinstanz, sklearn-Kreuzvergleich, Szenario-Reproduzierbarkeit, Multistart-Statistik |
+| `tests/` | Monotonie, Handinstanz, sklearn-Kreuzvergleich, Szenario-Reproduzierbarkeit, Multistart-Statistik, Medoid (von Hand, Brute Force, Regression des Mittelwert-Modus), Ausreißer, exakter p-Median, Zahlen (`test_claims.py`) |
 
 ## Lokal ausführen
 

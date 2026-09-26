@@ -7,11 +7,29 @@ DEFAULT_IMBALANCE = 0.0
 DEFAULT_SEED = 7
 DEFAULT_INIT_STRATEGY = "kmeans++"
 DEFAULT_SHAPE = "blobs"
+DEFAULT_CENTER = "mean"
+DEFAULT_OUTLIERS = 0
 
 N_POINTS_MIN, N_POINTS_MAX = 30, 400
 K_MIN, K_MAX = 2, 8
 SPREAD_MIN, SPREAD_MAX = 0.1, 0.9
 IMBALANCE_MIN, IMBALANCE_MAX = 0.0, 1.0
+OUTLIERS_MIN, OUTLIERS_MAX = 0, 10
+
+# k-Means (Mittelwert) oder k-Medoids (Medoid = der zentralste echte Datenpunkt) als Zentrum jedes Clusters.
+CENTER_TYPES = ("mean", "medoid")
+CENTER_LABELS = {"mean": "Mittelwert (k-Means)", "medoid": "Medoid (k-Medoids)"}
+OBJECTIVE_LABELS = {"mean": "Inertia (WCSS)", "medoid": "Summe der Abstände"}
+OBJECTIVE_AXIS_LABELS = {"mean": "Inertia (Summe quadrierter Abstände)", "medoid": "Summe der Abstände"}
+
+# Exakter p-Median (= k-Medoids-Optimum per MILP) nur bis zu dieser Punktzahl, auf Abruf.
+EXACT_MAX_POINTS = 80
+
+# Experimente auf Abruf: feste Netze (unabhängig vom Regler-Seed), Ausreißerzahlen, Neustarts je Lösung.
+EXPERIMENT_SEEDS = tuple(range(100000, 100040))
+OUTLIER_COUNTS = (1, 3, 5, 10)
+N_RESTARTS_COMPARE = 10
+COMPARE_SEED = 1
 
 SHAPES = ("blobs", "moons")
 SHAPE_LABELS = {"blobs": "Gruppen (Blobs)", "moons": "Halbmonde"}
@@ -50,5 +68,11 @@ PRESETS = {
     },
     "Nicht-konvexe Formen (k-Means scheitert)": {
         "n_points": 150, "k": 2, "spread": 0.1, "imbalance": 0.0, "shape": "moons", "seed": 2,
+    },
+    "Ausreißer ziehen den Mittelwert": {
+        "n_points": 120, "k": 3, "spread": 0.25, "imbalance": 0.0, "shape": "blobs", "seed": 3, "center": "mean", "outliers": 5,
+    },
+    "Medoid hält gegen Ausreißer": {
+        "n_points": 120, "k": 3, "spread": 0.25, "imbalance": 0.0, "shape": "blobs", "seed": 3, "center": "medoid", "outliers": 5,
     },
 }

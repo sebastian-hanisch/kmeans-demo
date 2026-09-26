@@ -21,6 +21,8 @@ class Step:
     labels: tuple  # nächstgelegenes Zentrum je Punkt, Erzeugungsreihenfolge wie die Daten
     inertia: float  # Summe der quadrierten Abstände zum jeweils zugewiesenen Zentrum (WCSS)
     n_changed: int  # Punkte, die diesen Schritt das Cluster gewechselt haben (Schritt 0: alle)
+    total_distance: float = 0.0  # Summe der (nicht quadrierten) euklidischen Abstände zum zugewiesenen Zentrum
+    objective: float = 0.0  # Zielgröße des Modus: Inertia beim Mittelwert, Summe der Abstände beim Medoid
 
 
 @dataclass(frozen=True)
@@ -28,6 +30,7 @@ class RunResult:
     steps: tuple  # Step-Folge in Ausführungsreihenfolge
     converged: bool  # True, wenn die letzte Zuweisung gegenüber der vorherigen unverändert blieb
     truncated: bool  # True, wenn max_iter erreicht wurde, ohne dass die Zuweisung stabil wurde
+    center: str = "mean"  # "mean" (k-Means) oder "medoid" (k-Medoids)
 
     @property
     def final_step(self):
@@ -44,6 +47,14 @@ class RunResult:
     @property
     def final_labels(self):
         return self.final_step.labels
+
+    @property
+    def final_objective(self):
+        return self.final_step.objective
+
+    @property
+    def final_total_distance(self):
+        return self.final_step.total_distance
 
 
 def _squared_distances(data, centers):
@@ -68,6 +79,27 @@ def _update_centers(data, labels, centers, k):
         mask = labels == i
         if mask.any():
             new_centers[i] = data[mask].mean(axis=0)
+    return new_centers
+
+
+def _total_distance(data, centers, labels):
+    """Summe der euklidischen Abstände jedes Punkts zu seinem zugewiesenen Zentrum (die Zielgröße von k-Medoids)."""
+    diff = data - centers[labels]
+    return float(np.sqrt((diff ** 2).sum(axis=1)).sum())
+
+
+def _update_medoids(data, labels, centers, k):
+    """Neues Zentrum = Medoid: der Punkt des Clusters mit der kleinsten Summe der euklidischen Abstände zu allen anderen
+    Punkten des Clusters (ein echter Datenpunkt; Gleichstand: der kleinste Index). Ein leer gewordenes Cluster behält sein
+    bisheriges Zentrum. Die Suche prüft alle Punktpaare im Cluster: O(|S|^2) statt O(|S|) beim Mittelwert."""
+    new_centers = centers.copy()
+    for i in range(k):
+        mask = labels == i
+        if mask.any():
+            pts = data[mask]
+            diff = pts[:, None, :] - pts[None, :, :]
+            sums = np.sqrt((diff ** 2).sum(axis=2)).sum(axis=1)
+            new_centers[i] = pts[int(np.argmin(sums))]
     return new_centers
 
 
@@ -98,26 +130,40 @@ def init_kmeans_plusplus(data, k, rng):
 INIT_FUNCTIONS = {"random": init_random, "kmeans++": init_kmeans_plusplus}
 
 
-def run(data, k, init_strategy, seed, max_iter=MAX_ITERATIONS):
+CENTER_UPDATES = {"mean": _update_centers, "medoid": _update_medoids}
+
+
+def run(data, k, init_strategy, seed, max_iter=MAX_ITERATIONS, center="mean"):
     """Führt Lloyd's Algorithmus vollständig protokolliert aus: Schritt 0 ist die erste
     Zuweisung nach der Initialisierung, jeder weitere Schritt ist ein vollständiger
     Update-dann-Zuweisung-Zyklus. Terminiert, sobald sich die Zuweisung nicht mehr
     ändert (bewiesen endlich, da es nur endlich viele Partitionen gibt und die Inertia
-    nie steigt - siehe Mathe-Abschnitt), spätestens nach max_iter Schritten."""
+    nie steigt - siehe Mathe-Abschnitt), spätestens nach max_iter Schritten.
+
+    center="medoid" ersetzt den Mittelwert im Update durch den Medoid (k-Medoids, Voronoi-Iteration): die Zuweisung bleibt
+    "nächstes Zentrum", die Zielgröße ist die Summe der (nicht quadrierten) Abstände; sie sinkt in beiden Schritten nie."""
     rng = np.random.default_rng(seed)
     data = np.asarray(data, dtype=float)
+    update = CENTER_UPDATES[center]
     centers = INIT_FUNCTIONS[init_strategy](data, k, rng)
 
+    def objective_of(inertia, total):
+        return inertia if center == "mean" else total
+
     labels, inertia = _assign(data, centers)
-    steps = [Step(0, tuple(map(tuple, centers)), tuple(int(l) for l in labels), inertia, n_changed=len(data))]
+    total = _total_distance(data, centers, labels)
+    steps = [Step(0, tuple(map(tuple, centers)), tuple(int(l) for l in labels), inertia, n_changed=len(data),
+                  total_distance=total, objective=objective_of(inertia, total))]
 
     converged = False
     for iteration in range(1, max_iter + 1):
-        new_centers = _update_centers(data, labels, centers, k)
+        new_centers = update(data, labels, centers, k)
         new_labels, new_inertia = _assign(data, new_centers)
+        new_total = _total_distance(data, new_centers, new_labels)
         n_changed = int(np.sum(new_labels != labels))
         steps.append(
-            Step(iteration, tuple(map(tuple, new_centers)), tuple(int(l) for l in new_labels), new_inertia, n_changed)
+            Step(iteration, tuple(map(tuple, new_centers)), tuple(int(l) for l in new_labels), new_inertia, n_changed,
+                 total_distance=new_total, objective=objective_of(new_inertia, new_total))
         )
         centers, labels = new_centers, new_labels
         if n_changed == 0:
@@ -125,4 +171,4 @@ def run(data, k, init_strategy, seed, max_iter=MAX_ITERATIONS):
             break
 
     truncated = not converged
-    return RunResult(steps=tuple(steps), converged=converged, truncated=truncated)
+    return RunResult(steps=tuple(steps), converged=converged, truncated=truncated, center=center)
