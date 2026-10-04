@@ -142,7 +142,7 @@ Sterne markieren die aktuellen Depot-Standorte.
 st.caption("🎯 Schnellstart – ein Beispielszenario laden:")
 PRESET_HELP = {
     "Einfaches Beispiel (klar getrennte Gruppen)": "3 klar getrennte, gleich große Gruppen - k-Means++ trifft praktisch immer die beste Aufteilung, reine Zufalls-Init kann aber auch hier schon danebengreifen.",
-    "Mittlere Schwierigkeit (etwas Überlappung)": "4 Gruppen mit spürbarer Überlappung - der Unterschied zwischen den Start-Strategien wird deutlicher sichtbar.",
+    "Mittlere Schwierigkeit (etwas Überlappung)": "4 Gruppen mit spürbarer Überlappung - hier liegen die beiden Start-Strategien dicht beieinander; erst ungleiche Gruppengrößen machen den Unterschied deutlich.",
     "Schwerer Fall (ungleiche Gruppengrößen)": "5 Gruppen, eine davon groß und diffus, die übrigen klein und dicht - Zufalls-Init scheitert hier reproduzierbar öfter an einem schlechten lokalen Optimum.",
     "Viele Gruppen (Suchraum wächst mit k)": "8 Gruppen - je mehr Depots gesucht werden, desto mehr mögliche Start-Kombinationen gibt es, und desto häufiger trifft reine Zufalls-Init eine schlechte.",
     "Ausreißer ziehen den Mittelwert": "120 Punkte, 3 Gruppen, 5 Ausreißer: der Mittelwert gibt ein Zentrum an die Ausreißer ab und verschmilzt zwei echte Gruppen - im besten von 10 Läufen wandern die Zentren im Mittel um 4,87 gegenüber der Lösung ohne Ausreißer, ein Drittel der echten Punkte ist falsch zugeordnet.",
@@ -439,8 +439,10 @@ $$
 \min_{c_1,\dots,c_k} \sum_{i=1}^n \min_{j \in \{1,\dots,k\}} \lVert x_i - c_j \rVert^2
 $$
 
-Bereits für $k=2$ in der Ebene ist das exakte globale Minimum NP-schwer zu berechnen
-(Aloise et al., 2009, "NP-hardness of Euclidean sum-of-squares clustering") - deshalb zeigt
+Bereits für $k=2$ ist das exakte globale Minimum NP-schwer zu berechnen, wenn die Dimension nicht
+beschränkt ist (Aloise et al., 2009, "NP-hardness of Euclidean sum-of-squares clustering"); auch in der
+Ebene bleibt es für beliebiges $k$ NP-schwer (Mahajan, Nimbhorkar, Varadarajan, "The planar k-means
+problem is NP-hard") - deshalb zeigt
 diese Demo bewusst keinen exakten Löser, sondern die Heuristik, mit der k-Means in der
 Praxis tatsächlich verwendet wird.
 
@@ -515,6 +517,6 @@ st.markdown("---")
 
 st.caption(
     "Diese Demo ist Teil des Portfolios von [Sebastian Hanisch](https://sebastianhanisch.net) – "
-    "Operations Research und Machine Learning. Interesse an einer maßgeschneiderten Lösung für "
-    "Ihr Unternehmen? [Kontakt aufnehmen](https://sebastianhanisch.net/kontakt.html)"
+    "Operations Research und Machine Learning ([Über mich](https://sebastianhanisch.net/ueber-mich.html)). "
+    "Mehr zur Reihe: [Clustering erklärt: k-Means bis HDBSCAN](https://sebastianhanisch.net/konzepte-clustering.html)."
 )

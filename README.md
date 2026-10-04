@@ -124,7 +124,7 @@ als harte Absicherung gegen einen theoretisch möglichen Grenzfall.
 ## Verifikation
 
 Ein exaktes globales Optimum ist für k-Means NP-schwer zu berechnen (Aloise et al., 2009 –
-bereits für k=2 in der Ebene), es gibt also keinen zweiten, exakten Löser zum Vergleich.
+bereits für k=2, wenn die Dimension nicht beschränkt ist; in der Ebene für beliebiges k: Mahajan/Nimbhorkar/Varadarajan), es gibt also keinen zweiten, exakten Löser zum Vergleich.
 Stattdessen drei unabhängige Prüfungen:
 
 - **Monotonie-Test**: die Inertia darf über keine Iteration hinweg steigen – die
@@ -172,6 +172,4 @@ pytest tests/ -v
 
 ---
 
-Teil des [Operations-Research-Demo-Portfolios](https://sebastianhanisch.net/demos.html) von
-[Sebastian Hanisch](https://sebastianhanisch.net) – Operations Research und Machine Learning.
-Interesse an einer maßgeschneiderten Lösung? [Kontakt aufnehmen](https://sebastianhanisch.net/kontakt.html).
+Diese Demo ist Teil des Portfolios von [Sebastian Hanisch](https://sebastianhanisch.net) – Operations Research und Machine Learning ([Über mich](https://sebastianhanisch.net/ueber-mich.html)). Mehr zur Reihe: [Clustering erklärt: k-Means bis HDBSCAN](https://sebastianhanisch.net/konzepte-clustering.html).
