@@ -54,7 +54,14 @@ def _counts_from_shares(k, imbalance, n_points):
     shares = _cluster_shares(k, imbalance)
     counts = np.maximum(1, np.round(shares * n_points).astype(int))
     counts[-1] += n_points - counts.sum()  # Rundungsrest auf das letzte Cluster
-    return np.maximum(counts, 1)
+    if counts[-1] < 1:
+        # Rundungsüberschuss größer als das letzte Cluster (kleine n, viele Gruppen): das letzte Cluster behält einen Punkt, der
+        # Rest wird den jeweils größten Clustern abgezogen - die Summe bleibt exakt n_points.
+        deficit = 1 - int(counts[-1])
+        counts[-1] = 1
+        for _ in range(deficit):
+            counts[int(np.argmax(counts))] -= 1
+    return counts
 
 
 def _generate_blobs(n_points, k, spread, imbalance, rng):
