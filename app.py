@@ -102,6 +102,17 @@ Abschnitt direkt darunter - bevor weiter unten die Suche live dazu läuft und di
 "📐 Wie stark hängt das Ergebnis vom Zufall der Startpunkte ab?" live beantwortet wird.
 """
 )
+
+# erklaerseite:einfach:start (erzeugt von tools/set_demo_explainer.py (Website-Repo) aus tools/content/explainers/kmeans-depots-erklaert.json, nicht von Hand ändern)
+with st.expander("💬 In einfachen Worten"):
+    st.markdown(
+        """
+Kundenstandorte sollen auf mehrere Depots aufgeteilt werden, jedes Depot bedient die Kunden, die ihm am nächsten liegen. **k-Means** erledigt das in zwei Schritten, die sich wiederholen: Erst bekommt jeder Kunde das nächste Depot, dann wandert jedes Depot in die Mitte seiner Kunden. Irgendwann ändert sich nichts mehr. Das Ergebnis hängt davon ab, wo die Depots anfangs stehen: Es kann eine stabile, aber schlechtere Aufteilung sein. Die Demo zeigt Schritt für Schritt, wann das passiert, was bessere Startpunkte bringen und warum einzelne weit entfernte Kunden die Depots verziehen können.
+
+[Ausführlich und verständlich erklärt, mit Fachteil](https://sebastianhanisch.net/kmeans-depots-erklaert.html)
+        """
+    )
+# erklaerseite:einfach:end
 st.caption(
     "Anders als die Fall-Demos im Portfolio, die an einem Anwendungsfall mehrere Verfahren "
     "vergleichen, zeigt diese Demo - Teil der wachsenden \"Konzepte\"-Reihe - **ein** Verfahren "
@@ -429,6 +440,25 @@ elif st.session_state.get("exact_on"):
 st.markdown("---")
 
 with st.expander("📐 Mathematische Formulierung"):
+    # erklaerseite:lesehilfe:start (erzeugt von tools/set_demo_explainer.py (Website-Repo) aus tools/content/explainers/kmeans-depots-erklaert.json, nicht von Hand ändern)
+    st.markdown(
+        r"""
+**Lesehilfe.** Gegeben sind die Kundenstandorte als Punkte in der Ebene und die Zahl $k$ der Depots. Gesucht sind $k$ Depot-Standorte, bei denen die Summe der quadrierten Entfernungen zwischen jedem Kunden und seinem nächsten Depot am kleinsten ist.
+
+| Symbol | Bedeutung |
+|---|---|
+| $x_i$, $n$ | Kundenstandort $i$ (Punkt in der Ebene), Zahl der Kunden |
+| $k$ | Zahl der Depots (Cluster) |
+| $c_j$ | Depot-Standort (Zentrum) $j$ |
+| $S_j$ | Menge der Kunden, die dem Depot $j$ zugewiesen sind |
+| $D(x)$ | Abstand des Punkts $x$ zum nächstgelegenen bereits gewählten Zentrum |
+| $P(x)$ | Wahrscheinlichkeit, dass $x$ als nächster Startpunkt gewählt wird |
+| $X$, $S$ | Menge aller Kunden, Menge der $k$ gewählten Zentren (k-Medoids: Zentren sind Kunden) |
+
+[Schritt für Schritt erklärt, mit Herleitung und Literatur](https://sebastianhanisch.net/kmeans-depots-erklaert.html#fachleute)
+        """
+    )
+    # erklaerseite:lesehilfe:end
     st.markdown(
         r"""
 **k-Means-Zielfunktion:** gegeben $n$ Punkte $x_1, \dots, x_n \in \mathbb{R}^2$ und eine
